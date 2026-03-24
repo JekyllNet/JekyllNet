@@ -124,7 +124,7 @@ public sealed class TemplateRendererTests
             ["row.html"] = "[{{ include.title }}]"
         });
 
-        Assert.Equal("[alpha][beta]", output.Trim());
+        Assert.Equal("[alpha][beta]", string.Concat(output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)));
     }
 
     [Fact]

@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>兼容性说明 | JekyllNet</title>
-  <meta name="description" content="Jekyll.Net 当前已实现与待补齐的范围。">
+  <meta name="description" content="Jekyll.Net 已覆盖、部分覆盖与尚未覆盖的能力边界。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -75,32 +75,97 @@
 
 
           <h1 id="section">兼容性说明</h1>
-<p>项目目标不是重新发明一个随意的静态站点生成器，而是逐步向 GitHub Pages 常见行为靠拢。</p>
-<h2 id="section-1">当前已经覆盖</h2>
+<p><code>Jekyll.Net</code> 的目标不是做一个“带一点 Liquid 语法的任意静态站点生成器”，而是逐步补齐常见的 Jekyll / GitHub Pages 行为，并且保持 .NET 代码库可测试、可维护。</p>
+<h2 id="section-1">兼容矩阵</h2>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_config.yml</code> 读取</td>
+<td>已完成</td>
+<td>常用站点配置、defaults、include/exclude、站点级 permalink fallback、页脚和统计配置都已进入构建流程。</td>
+</tr>
+<tr>
+<td>Front matter</td>
+<td>已完成</td>
+<td>YAML front matter、defaults、页面变量、静态文件 front matter 与 excerpt 都已支持。</td>
+</tr>
+<tr>
+<td>Markdown 与布局</td>
+<td>已完成</td>
+<td>Markdown 转 HTML、嵌套 layout、includes、collections、posts、tags、categories 都已在正常构建链路中。</td>
+</tr>
+<tr>
+<td>Snapshot 回归</td>
+<td>已完成</td>
+<td><code>docs</code> 与 <code>sample-site</code> 都有 golden output / snapshot 回归保护。</td>
+</tr>
+<tr>
+<td>Filters</td>
+<td>已完成</td>
+<td><code>relative_url</code>、<code>absolute_url</code>、<code>markdownify</code>、<code>where</code>、<code>sort</code>、<code>map</code>、<code>compact</code>、<code>jsonify</code>、<code>slugify</code> 等高价值 filter 已补齐。</td>
+</tr>
+<tr>
+<td>发布语义</td>
+<td>已完成</td>
+<td><code>drafts</code>、<code>future</code>、<code>unpublished</code> 都已经接入真实构建行为。</td>
+</tr>
+<tr>
+<td>Pagination</td>
+<td>部分完成</td>
+<td>基线分页已可用，支持 <code>paginate</code>、<code>paginate_path</code>、结构化 <code>pagination.per_page</code>、<code>pagination.path</code> 和单页禁用。更细的 Jekyll 对齐还在继续。</td>
+</tr>
+<tr>
+<td>Liquid 控制语义</td>
+<td>部分完成</td>
+<td><code>if</code>、<code>for</code>、<code>unless</code>、<code>case/when</code>、<code>capture</code>、<code>contains</code> 可用。剩余缺口主要集中在 <code>assign</code> 作用域和少量 include 时机边角。</td>
+</tr>
+<tr>
+<td>GitHub Pages 对齐</td>
+<td>部分完成</td>
+<td>已覆盖常见行为，但还没有承诺与某个 GitHub Pages 固定版本 1:1 完全一致。</td>
+</tr>
+<tr>
+<td>插件生态</td>
+<td>尚未支持</td>
+<td>第三方 Jekyll 插件兼容仍然不在当前支持边界内。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fixture">已验证的 Fixture</h2>
 <ul>
-<li><code>_config.yml</code></li>
-<li>YAML Front Matter</li>
-<li>Markdown 转 HTML</li>
-<li><code>_layouts</code> 与嵌套 layout</li>
-<li><code>_includes</code></li>
-<li><code>_data</code></li>
-<li><code>_posts</code></li>
-<li><code>collections</code></li>
-<li><code>tags/categories</code></li>
-<li>基础 Liquid 标签与常见 filters</li>
-<li>Sass/SCSS 编译</li>
-<li>静态资源复制到 <code>_site</code></li>
+<li><code>sample-site</code>：一个更接近真实内容站点的 golden regression 基线</li>
+<li><code>docs</code>：项目自己的多语言文档站，也由 snapshot 测试锁定输出</li>
+<li>聚焦 renderer 的小型 fixture：用于验证 assign、include、嵌套块、filters、pagination 等语义</li>
 </ul>
-<h2 id="section-2">当前仍然有限制</h2>
+<h2 id="section-2">当前边界</h2>
+<p>现在的 <code>Jekyll.Net</code> 已经比较适合：</p>
 <ul>
-<li>pagination</li>
-<li>更完整的 Liquid 语法和 filters 覆盖</li>
-<li>excerpts / drafts / future / unpublished</li>
-<li>更完整的 GitHub Pages 固定版本兼容行为</li>
-<li>对真实 Jekyll 插件生态的兼容</li>
+<li>项目文档站</li>
+<li>中小型内容站</li>
+<li>带 AI 辅助翻译的多语言文档站</li>
+<li>主要依赖常见 Liquid 与常见 <code>_config.yml</code> 行为的 GitHub Pages 风格主题</li>
 </ul>
-<h2 id="section-3">怎么理解这个差距</h2>
-<p>如果你把 <code>Jekyll.Net</code> 当成一个“先满足项目文档站，再逐步抹平兼容细节”的实现，这个状态是合理的。它已经足够支撑小型项目站点，但还没有承诺和 GitHub Pages 做到完全一比一。</p>
+<p>但它现在还没有宣称：</p>
+<ul>
+<li>与 GitHub Pages 固定版本完全等价</li>
+<li>广泛兼容第三方插件</li>
+<li>完整覆盖 Liquid 全语法</li>
+<li>与不同分页插件的所有细节完全一致</li>
+</ul>
+<h2 id="section-3">仍在继续补齐的地方</h2>
+<ul>
+<li><code>assign</code> 在更多 Liquid 边角中的作用域对齐</li>
+<li><code>include</code> 在剩余 corner case 中的渲染时机</li>
+<li>当前分页基线之上的更多细节</li>
+<li>按功能域持续收紧兼容边界说明</li>
+</ul>
 
         </article>
       </div>

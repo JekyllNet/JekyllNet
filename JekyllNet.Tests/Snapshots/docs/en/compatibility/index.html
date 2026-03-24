@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Compatibility Notes | JekyllNet</title>
-  <meta name="description" content="What Jekyll.Net already implements and what still remains.">
+  <meta name="description" content="What Jekyll.Net already implements, what is partial, and what still remains.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -75,32 +75,97 @@
 
 
           <h1 id="compatibility-notes">Compatibility Notes</h1>
-<p>The project goal is not to build an arbitrary static site generator. The direction is to move closer to common GitHub Pages behavior over time.</p>
-<h2 id="already-covered">Already covered</h2>
+<p>Jekyll.Net is not trying to be “a random static site generator with some Liquid syntax”. The direction is to close the gap with common Jekyll and GitHub Pages behavior in a way that stays testable and maintainable in .NET.</p>
+<h2 id="compatibility-matrix">Compatibility Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_config.yml</code> loading</td>
+<td>Done</td>
+<td>Common site config, defaults, include/exclude, permalink fallback, footer and analytics options are wired into the build.</td>
+</tr>
+<tr>
+<td>Front matter</td>
+<td>Done</td>
+<td>YAML front matter, defaults, page variables, static file front matter, and excerpts are supported.</td>
+</tr>
+<tr>
+<td>Markdown and layouts</td>
+<td>Done</td>
+<td>Markdown to HTML, nested layouts, includes, collections, posts, tags, and categories are in the normal build pipeline.</td>
+</tr>
+<tr>
+<td>Snapshot regression</td>
+<td>Done</td>
+<td><code>docs</code> and <code>sample-site</code> are protected by golden output regression tests.</td>
+</tr>
+<tr>
+<td>Filters</td>
+<td>Done</td>
+<td>High-value theme filters such as <code>relative_url</code>, <code>absolute_url</code>, <code>markdownify</code>, <code>where</code>, <code>sort</code>, <code>map</code>, <code>compact</code>, <code>jsonify</code>, and <code>slugify</code> are available.</td>
+</tr>
+<tr>
+<td>Publishing semantics</td>
+<td>Done</td>
+<td><code>drafts</code>, <code>future</code>, and <code>unpublished</code> are all connected to real build behavior.</td>
+</tr>
+<tr>
+<td>Pagination</td>
+<td>Partial</td>
+<td>Baseline pagination works, including <code>paginate</code>, <code>paginate_path</code>, structured <code>pagination.per_page</code>, <code>pagination.path</code>, and per-page disable. More edge cases still need Jekyll-level alignment.</td>
+</tr>
+<tr>
+<td>Liquid control flow</td>
+<td>Partial</td>
+<td><code>if</code>, <code>for</code>, <code>unless</code>, <code>case/when</code>, <code>capture</code>, and <code>contains</code> work. The remaining compatibility gap is mainly <code>assign</code> scope polish and include timing corner cases.</td>
+</tr>
+<tr>
+<td>GitHub Pages parity</td>
+<td>Partial</td>
+<td>Common behavior is covered, but this is not yet version-pinned one-to-one parity with a specific GitHub Pages release.</td>
+</tr>
+<tr>
+<td>Plugin ecosystem</td>
+<td>Not yet</td>
+<td>Third-party Jekyll plugin compatibility is still outside the supported boundary.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verified-fixtures">Verified Fixtures</h2>
 <ul>
-<li><code>_config.yml</code></li>
-<li>YAML Front Matter</li>
-<li>Markdown to HTML</li>
-<li><code>_layouts</code> and nested layouts</li>
-<li><code>_includes</code></li>
-<li><code>_data</code></li>
-<li><code>_posts</code></li>
-<li><code>collections</code></li>
-<li><code>tags/categories</code></li>
-<li>basic Liquid tags and common filters</li>
-<li>Sass or SCSS compilation</li>
-<li>static asset copying into <code>_site</code></li>
+<li><code>sample-site</code>: a practical content and theme-style site used as a golden regression baseline</li>
+<li><code>docs</code>: the project’s own multilingual documentation site, also locked by snapshot tests</li>
+<li>focused renderer fixtures: targeted tests for Liquid semantics such as assign, include, nested blocks, filters, and pagination</li>
 </ul>
-<h2 id="still-limited">Still limited</h2>
+<h2 id="current-boundary">Current Boundary</h2>
+<p>Jekyll.Net is already a reasonable fit for:</p>
 <ul>
-<li>pagination</li>
-<li>broader Liquid syntax and filter coverage</li>
-<li>excerpts / drafts / future / unpublished</li>
-<li>stricter GitHub Pages version-level compatibility</li>
-<li>compatibility with the wider Jekyll plugin ecosystem</li>
+<li>project documentation sites</li>
+<li>small and medium content sites</li>
+<li>multilingual docs with AI-assisted translation</li>
+<li>GitHub Pages style themes that stay within common Liquid and config behavior</li>
 </ul>
-<h2 id="how-to-think-about-the-gap">How to think about the gap</h2>
-<p>If you treat Jekyll.Net as a project that first needs to serve real documentation sites and then close compatibility gaps over time, the current status is coherent. It is already useful for small sites, but it is not promising one-to-one parity yet.</p>
+<p>It is not yet claiming:</p>
+<ul>
+<li>full GitHub Pages version parity</li>
+<li>broad plugin compatibility</li>
+<li>complete Liquid language coverage</li>
+<li>perfect pagination parity with every Jekyll plugin variant</li>
+</ul>
+<h2 id="what-is-still-being-closed">What Is Still Being Closed</h2>
+<ul>
+<li><code>assign</code> scope alignment in more Liquid edge cases</li>
+<li><code>include</code> rendering timing in the remaining corner cases</li>
+<li>pagination details beyond the current baseline</li>
+<li>sharper compatibility statements per feature group over time</li>
+</ul>
 
         </article>
       </div>
