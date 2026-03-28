@@ -1,3 +1,6 @@
 [submodule "action"]
 	path = action
 	url = https://github.com/JekyllNet/action.git
+[submodule "profile"]
+	path = profile
+	url = https://github.com/JekyllNet/.github.git
