@@ -73,6 +73,37 @@ public sealed class SiteBuilderBehaviorTests
     }
 
     [Fact]
+    public async Task Build_RendersLiquidBeforeMarkdown_ForMarkdownPages()
+    {
+        var sourceDirectory = TestInfrastructure.CreateSiteFixture(new Dictionary<string, string>
+        {
+            ["_layouts/default.html"] = """
+                {{ content }}
+                """,
+            ["_includes/feature_row.html"] = """
+                <div class="feature__wrapper">{{ page.title }}</div>
+                """,
+            ["index.md"] = """
+                ---
+                layout: default
+                title: Home
+                excerpt: Front matter summary
+                ---
+
+                {% include feature_row.html %}
+                """
+        });
+
+        var outputDirectory = await TestInfrastructure.BuildSiteAsync(sourceDirectory);
+        var output = await File.ReadAllTextAsync(Path.Combine(outputDirectory, "index.html"));
+
+        Assert.Contains("""<div class="feature__wrapper">Home</div>""", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("<p><div", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("<pre><code>&lt;div", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("""content="<p>{% include""", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Build_AppliesFrontMatterAndDefaultsToStaticFiles()
     {
         var sourceDirectory = TestInfrastructure.CreateSiteFixture(new Dictionary<string, string>

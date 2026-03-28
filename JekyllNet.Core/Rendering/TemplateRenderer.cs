@@ -48,7 +48,7 @@ public sealed partial class TemplateRenderer
                     break;
                 }
 
-                var expression = template[(variableStart + 2)..variableEnd].Trim();
+                var expression = NormalizeLiquidMarkup(template[(variableStart + 2)..variableEnd]);
                 output.Append(ResolveExpression(expression, scope)?.ToString() ?? string.Empty);
                 index = variableEnd + 2;
                 continue;
@@ -61,7 +61,7 @@ public sealed partial class TemplateRenderer
                 break;
             }
 
-            var tagContent = template[(tagStart + 2)..tagEnd].Trim();
+            var tagContent = NormalizeLiquidMarkup(template[(tagStart + 2)..tagEnd]);
             var tagName = GetTagName(tagContent);
             index = tagEnd + 2;
 
@@ -352,13 +352,15 @@ public sealed partial class TemplateRenderer
         while (TryFindTag(template, cursor, out var tagStart, out var tagEnd, out var tagContent))
         {
             var tagName = GetTagName(tagContent);
-            if (string.Equals(tagName, openingTagName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(tagName, "if", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(tagName, "unless", StringComparison.OrdinalIgnoreCase))
             {
                 depth++;
             }
-            else if (string.Equals(tagName, closingTagName, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(tagName, "endif", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(tagName, "endunless", StringComparison.OrdinalIgnoreCase))
             {
-                if (depth == 0)
+                if (depth == 0 && string.Equals(tagName, closingTagName, StringComparison.OrdinalIgnoreCase))
                 {
                     trueBranch = elseTagStart >= 0
                         ? template[startIndex..elseTagStart]
@@ -369,7 +371,10 @@ public sealed partial class TemplateRenderer
                     return tagEnd + 2;
                 }
 
-                depth--;
+                if (depth > 0)
+                {
+                    depth--;
+                }
             }
             else if (string.Equals(tagName, "else", StringComparison.OrdinalIgnoreCase) && depth == 0 && elseTagStart < 0)
             {
@@ -652,10 +657,14 @@ public sealed partial class TemplateRenderer
             "join" => ApplyJoinFilter(value, ResolveSingleArgument(argument, variables)?.ToString()),
             "split" => ApplySplitFilter(value, ResolveSingleArgument(argument, variables)?.ToString()),
             "strip" => value?.ToString()?.Trim(),
+            "strip_html" => ApplyStripHtmlFilter(value),
+            "strip_newlines" => ApplyStripNewlinesFilter(value),
             "append" => (value?.ToString() ?? string.Empty) + (ResolveSingleArgument(argument, variables)?.ToString() ?? string.Empty),
             "prepend" => (ResolveSingleArgument(argument, variables)?.ToString() ?? string.Empty) + (value?.ToString() ?? string.Empty),
             "replace" => ApplyReplaceFilter(value, argument),
             "replace_first" => ApplyReplaceFirstFilter(value, argument),
+            "remove" => ApplyRemoveFilter(value, argument, variables),
+            "remove_first" => ApplyRemoveFirstFilter(value, argument, variables),
             "first" => ApplyFirstFilter(value),
             "last" => ApplyLastFilter(value),
             "where" => ApplyWhereFilter(value, argument, variables),
@@ -667,6 +676,9 @@ public sealed partial class TemplateRenderer
             "relative_url" => ApplyRelativeUrlFilter(value, variables),
             "absolute_url" => ApplyAbsoluteUrlFilter(value, variables),
             "markdownify" => ApplyMarkdownifyFilter(value),
+            "newline_to_br" => ApplyNewlineToBrFilter(value),
+            "escape" => ApplyEscapeFilter(value),
+            "escape_once" => ApplyEscapeFilter(value),
             _ => value
         };
     }
@@ -732,6 +744,30 @@ public sealed partial class TemplateRenderer
         }
 
         return source[..index] + newValue + source[(index + oldValue.Length)..];
+    }
+
+    private static object ApplyRemoveFilter(object? value, string? argument, IReadOnlyDictionary<string, object?> variables)
+    {
+        var source = value?.ToString() ?? string.Empty;
+        var target = ResolveSingleArgument(argument, variables)?.ToString() ?? string.Empty;
+        return string.IsNullOrEmpty(target)
+            ? source
+            : source.Replace(target, string.Empty, StringComparison.Ordinal);
+    }
+
+    private static object ApplyRemoveFirstFilter(object? value, string? argument, IReadOnlyDictionary<string, object?> variables)
+    {
+        var source = value?.ToString() ?? string.Empty;
+        var target = ResolveSingleArgument(argument, variables)?.ToString() ?? string.Empty;
+        if (string.IsNullOrEmpty(target))
+        {
+            return source;
+        }
+
+        var index = source.IndexOf(target, StringComparison.Ordinal);
+        return index < 0
+            ? source
+            : source[..index] + source[(index + target.Length)..];
     }
 
     private static object? ApplyFirstFilter(object? value)
@@ -839,6 +875,31 @@ public sealed partial class TemplateRenderer
 
     private static string ApplyMarkdownifyFilter(object? value)
         => Markdown.ToHtml(value?.ToString() ?? string.Empty, MarkdownPipeline).TrimEnd();
+
+    private static string ApplyStripHtmlFilter(object? value)
+        => System.Text.RegularExpressions.Regex.Replace(value?.ToString() ?? string.Empty, "<.*?>", string.Empty, System.Text.RegularExpressions.RegexOptions.Singleline);
+
+    private static string ApplyStripNewlinesFilter(object? value)
+        => (value?.ToString() ?? string.Empty)
+            .Replace("\r", string.Empty, StringComparison.Ordinal)
+            .Replace("\n", string.Empty, StringComparison.Ordinal);
+
+    private static string ApplyNewlineToBrFilter(object? value)
+    {
+        var text = value?.ToString() ?? string.Empty;
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        return text
+            .Replace("\r\n", "<br />\n", StringComparison.Ordinal)
+            .Replace("\n", "<br />\n", StringComparison.Ordinal)
+            .Replace("\r", "<br />\n", StringComparison.Ordinal);
+    }
+
+    private static string ApplyEscapeFilter(object? value)
+        => System.Net.WebUtility.HtmlEncode(value?.ToString() ?? string.Empty);
 
     private static object ApplyWhereFilter(object? value, string? argument, IReadOnlyDictionary<string, object?> variables)
     {
@@ -1285,7 +1346,7 @@ public sealed partial class TemplateRenderer
             return false;
         }
 
-        tagContent = template[(tagStart + 2)..tagEnd].Trim();
+        tagContent = NormalizeLiquidMarkup(template[(tagStart + 2)..tagEnd]);
         return true;
     }
 
@@ -1293,6 +1354,23 @@ public sealed partial class TemplateRenderer
     {
         var firstSpace = tagContent.IndexOf(' ');
         return firstSpace >= 0 ? tagContent[..firstSpace] : tagContent;
+    }
+
+    private static string NormalizeLiquidMarkup(string markup)
+    {
+        var normalized = markup.Trim();
+
+        if (normalized.Length > 0 && normalized[0] == '-')
+        {
+            normalized = normalized[1..].TrimStart();
+        }
+
+        if (normalized.Length > 0 && normalized[^1] == '-')
+        {
+            normalized = normalized[..^1].TrimEnd();
+        }
+
+        return normalized;
     }
 
     private static int NextTokenStart(int variableStart, int tagStart)

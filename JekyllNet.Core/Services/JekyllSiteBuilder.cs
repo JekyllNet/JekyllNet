@@ -18,6 +18,7 @@ public sealed class JekyllSiteBuilder
     private readonly FrontMatterParser _frontMatterParser = new();
     private readonly TemplateRenderer _templateRenderer = new();
     private readonly IDeserializer _yamlDeserializer = new DeserializerBuilder().Build();
+    private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
     private static int _sassEngineRegistered;
 
     public async Task BuildAsync(JekyllSiteOptions options, CancellationToken cancellationToken = default)
@@ -45,8 +46,6 @@ public sealed class JekyllSiteBuilder
         var data = await LoadDataAsync(templateDirectories, options, cancellationToken);
         var layouts = await LoadNamedTemplatesAsync(templateDirectories, options.Compatibility.LayoutsDirectoryName, cancellationToken);
         var includes = await LoadNamedTemplatesAsync(templateDirectories, options.Compatibility.IncludesDirectoryName, cancellationToken);
-        var markdownPipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-
         LogInfo(options, $"Loaded site configuration, {layouts.Count} layout entries, {includes.Count} include entries, and {data.Count} top-level data entries.");
         if (inheritedThemeDirectories.Count > 0)
         {
@@ -89,7 +88,7 @@ public sealed class JekyllSiteBuilder
         }
 
         LogInfo(options, $"Discovered {items.Count} content item(s).");
-        PrepareContentItems(items, markdownPipeline, siteConfig);
+        PrepareContentItems(items, MarkdownPipeline, siteConfig);
         var posts = items.Where(x => x.IsPost).OrderByDescending(x => x.Date).ToList();
         var paginatedItems = CreatePaginationItems(items, posts, siteConfig, options);
         items.AddRange(paginatedItems);
@@ -123,8 +122,11 @@ public sealed class JekyllSiteBuilder
 
             try
             {
-                var variables = BuildVariables(context, item, item.RenderedContent);
-                var rendered = ApplyLayout(item, item.RenderedContent, context.Layouts, context.Includes, variables);
+                var sourceContent = item.SourcePath.EndsWith(".html", StringComparison.OrdinalIgnoreCase)
+                    ? item.RenderedContent
+                    : item.RawContent;
+                var variables = BuildVariables(context, item, sourceContent);
+                var rendered = ApplyLayout(item, sourceContent, context.Layouts, context.Includes, variables);
                 rendered = ApplyAutomaticSiteEnhancements(rendered, item.OutputRelativePath, siteConfig, item.FrontMatter);
 
                 var destinationPath = Path.Combine(options.DestinationDirectory, item.OutputRelativePath.Replace('/', Path.DirectorySeparatorChar));
@@ -228,7 +230,7 @@ public sealed class JekyllSiteBuilder
         var page = new Dictionary<string, object?>(item.FrontMatter, StringComparer.OrdinalIgnoreCase)
         {
             ["content"] = content,
-            ["excerpt"] = item.Excerpt,
+            ["excerpt"] = ResolveExcerptValue(item),
             ["path"] = item.RelativePath,
             ["url"] = item.Url,
             ["date"] = item.Date,
@@ -516,7 +518,7 @@ public sealed class JekyllSiteBuilder
 
         if (includeExcerpt)
         {
-            result["excerpt"] = item.Excerpt;
+            result["excerpt"] = ResolveExcerptValue(item);
         }
 
         return result;
@@ -539,7 +541,12 @@ public sealed class JekyllSiteBuilder
         IReadOnlyDictionary<string, string> includes,
         Dictionary<string, object?> variables)
     {
-        var pageContent = _templateRenderer.Render(content, variables, includes);
+        var renderedContent = _templateRenderer.Render(content, variables, includes);
+        var pageContent = item.SourcePath.EndsWith(".html", StringComparison.OrdinalIgnoreCase)
+            ? renderedContent
+            : ShouldPreserveRenderedHtml(renderedContent)
+                ? renderedContent
+                : Markdown.ToHtml(renderedContent, MarkdownPipeline);
         variables["content"] = pageContent;
 
         if (variables["page"] is Dictionary<string, object?> page)
@@ -2454,6 +2461,12 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
         IReadOnlyDictionary<string, object?> frontMatter,
         IReadOnlyDictionary<string, object?> siteConfig)
     {
+        if (frontMatter.TryGetValue("excerpt", out var explicitExcerpt)
+            && !string.IsNullOrWhiteSpace(explicitExcerpt?.ToString()))
+        {
+            return explicitExcerpt.ToString()!.Trim();
+        }
+
         var separator = frontMatter.TryGetValue("excerpt_separator", out var frontMatterSeparator)
             ? frontMatterSeparator?.ToString()
             : siteConfig.TryGetValue("excerpt_separator", out var configSeparator)
@@ -2477,6 +2490,29 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
 
         var paragraphs = normalized.Split("\n\n", 2, StringSplitOptions.None);
         return paragraphs[0].Trim();
+    }
+
+    private static string ResolveExcerptValue(JekyllContentItem item)
+    {
+        if (item.FrontMatter.TryGetValue("excerpt", out var explicitExcerpt)
+            && !string.IsNullOrWhiteSpace(explicitExcerpt?.ToString()))
+        {
+            return explicitExcerpt.ToString()!;
+        }
+
+        return item.Excerpt;
+    }
+
+    private static bool ShouldPreserveRenderedHtml(string content)
+    {
+        var trimmed = content.Trim();
+        if (trimmed.Length == 0 || trimmed[0] != '<')
+        {
+            return false;
+        }
+
+        return !trimmed.Contains("{%", StringComparison.Ordinal)
+            && !trimmed.Contains("{{", StringComparison.Ordinal);
     }
 
     private static string ResolveDefaultScopeType(string relativePath, HashSet<string> collections, JekyllSiteOptions options)

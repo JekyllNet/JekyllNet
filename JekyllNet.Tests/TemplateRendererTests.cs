@@ -412,6 +412,47 @@ public sealed class TemplateRendererTests
     }
 
     [Fact]
+    public void WhitespaceControlSyntax_ParsesCommentIfAndVariableBlocks()
+    {
+        const string template = """
+            {%- comment -%}hidden{% endcomment -%}
+            {%- if site.enable_feed -%}
+            <link href="{{- '/feed.xml' | relative_url -}}">
+            {%- endif -%}
+            """;
+
+        var output = _renderer.Render(template, new Dictionary<string, object?>
+        {
+            ["site"] = new Dictionary<string, object?>
+            {
+                ["enable_feed"] = true,
+                ["baseurl"] = "/minimal-mistakes"
+            }
+        });
+
+        Assert.DoesNotContain("hidden", output, StringComparison.Ordinal);
+        Assert.Contains("""<link href="/minimal-mistakes/feed.xml">""", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CommonThemeFilters_RenderExpectedOutput()
+    {
+        const string template = """
+            {{ "<p>Hello</p>" | strip_html | strip_newlines }}
+            {{ "<p>Hello</p>" | remove: "<p>" | remove: "</p>" }}
+            {{ "Tom & Jerry" | escape_once }}
+            {{ "line1
+            line2" | newline_to_br }}
+            """;
+
+        var output = _renderer.Render(template, new Dictionary<string, object?>());
+
+        Assert.Contains("Hello", output, StringComparison.Ordinal);
+        Assert.Contains("Tom &amp; Jerry", output, StringComparison.Ordinal);
+        Assert.Contains("line1<br />", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Where_WithSinglePropertyArgument_FiltersTruthyItems()
     {
         const string template = """
