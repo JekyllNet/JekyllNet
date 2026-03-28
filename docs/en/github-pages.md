@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: JekyllNet/JekyllNet@main
+      - uses: JekyllNet/action@main
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -72,12 +72,12 @@ This repository now also includes `.github/workflows/github-pages.yml`.
 
 That workflow:
 
-- builds `./docs` with the local JekyllNet action
+- builds `./docs` with the local JekyllNet CLI project
 - uploads `./artifacts/docs-site` as the GitHub Pages artifact
 - deploys on pushes to `main`
 - runs on pull requests as a build check, without publishing
 
-It is wired to changes in `docs/**`, `JekyllNet.Cli/**`, `JekyllNet.Core/**`, `action.yml`, `JekyllNet.slnx`, and the workflow file itself, so documentation and generator changes both refresh the published site.
+It is wired to changes in `docs/**`, `JekyllNet.Cli/**`, `JekyllNet.Core/**`, `JekyllNet.slnx`, and the workflow file itself, so documentation and generator changes both refresh the published site.
 
 The related workflow guidance is summarized in [CLI and Development Workflow](/en/blog/cli-workflow/).
 ---

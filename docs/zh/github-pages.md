@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: JekyllNet/JekyllNet@main
+      - uses: JekyllNet/action@main
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -70,12 +70,12 @@ jobs:
 
 其所行者：
 
-- 以本仓库内之 JekyllNet action 构建 `./docs`
+- 以本仓库内之 JekyllNet CLI 项目构建 `./docs`
 - 将 `./artifacts/docs-site` 上传为 GitHub Pages artifact
 - 于推送至 `main` 时正式发布
 - 于 PR 中只做构建校验，不实际部署
 
-其触发范围含 `docs/**`、`JekyllNet.Cli/**`、`JekyllNet.Core/**`、`action.yml`、`JekyllNet.slnx` 与工作流自身；故文档之改，或生成器之改，皆可使 Pages 站点随之更新。
+其触发范围含 `docs/**`、`JekyllNet.Cli/**`、`JekyllNet.Core/**`、`JekyllNet.slnx` 与工作流自身；故文档之改，或生成器之改，皆可使 Pages 站点随之更新。
 
 更详之命令行与自动化说明，可参 [CLI 与开发工作流](/zh/blog/cli-workflow/)。
 ---

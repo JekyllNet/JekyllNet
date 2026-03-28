@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: JekyllNet/JekyllNet@main
+      - uses: JekyllNet/action@main
         with:
           source: ./docs
           destination: ./artifacts/docs-site

@@ -33,7 +33,7 @@ The repository now also includes:
 
 ## Reusable GitHub Action
 
-The repository root now exposes a build action, so another repository can call JekyllNet without copying the workflow steps by hand.
+The standalone `JekyllNet/action` repository now exposes a build action, so another repository can call JekyllNet without copying the workflow steps by hand.
 
 ```yml
 jobs:
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: JekyllNet/JekyllNet@main
+      - uses: JekyllNet/action@main
         with:
           source: ./docs
           destination: ./artifacts/docs-site

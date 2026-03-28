@@ -114,7 +114,7 @@ GitHub 头像建议使用：
 
 仓库现在同时提供：
 
-- 📄 根目录 `action.yml`，可直接作为可复用 GitHub Action 使用
+- 📄 `action/` 子模块，承载独立的 JekyllNet GitHub Action 仓库
 - 📄 `.github/workflows/ci.yml`
 - 📄 `.github/workflows/github-pages.yml`
 - 📄 `.github/workflows/publish-dotnet-tool.yml`
@@ -122,8 +122,8 @@ GitHub 头像建议使用：
 
 用途：
 
-- ⚙️ `action.yml`：在任意仓库中构建 JekyllNet 站点，并可选上传构建产物
-- ⚙️ `ci.yml`：测试、通过 action 构建 `docs` / `sample-site`、打包 dotnet tool
+- ⚙️ `action/`：独立维护的 GitHub Action 仓库，可在任意仓库中复用
+- ⚙️ `ci.yml`：测试、通过 CLI 构建 `docs` / `sample-site`、打包 dotnet tool
 - ⚙️ `github-pages.yml`：当 `docs` 或站点生成器相关代码变化时，构建 `docs` 并发布到 GitHub Pages
 - ⚙️ `publish-dotnet-tool.yml`：将 `JekyllNet` 作为 dotnet tool 包发布到 NuGet
 - ⚙️ `release-artifacts.yml`：生成 `nupkg`、Windows portable zip、SHA256 与已填充的 `winget` manifests，并在 tag 发布时同步挂到 GitHub Release
@@ -146,7 +146,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build docs with JekyllNet
-        uses: JekyllNet/JekyllNet@main
+        uses: JekyllNet/action@main
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -162,7 +162,7 @@ jobs:
 
 该 workflow 会：
 
-- 在 `main` 分支收到 `docs/**`、`JekyllNet.Cli/**`、`JekyllNet.Core/**`、`action.yml` 或工作流自身变更时自动触发
+- 在 `main` 分支收到 `docs/**`、`JekyllNet.Cli/**`、`JekyllNet.Core/**`、`JekyllNet.slnx` 或工作流自身变更时自动触发
 - 在 PR 中执行构建校验，但不实际部署
 - 在推送到 `main` 后把 `./artifacts/docs-site` 发布到 GitHub Pages
 
