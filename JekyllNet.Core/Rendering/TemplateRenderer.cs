@@ -1214,13 +1214,23 @@ public sealed partial class TemplateRenderer
     {
         switch (current)
         {
-            case IReadOnlyDictionary<string, object?> readOnlyDictionary when readOnlyDictionary.TryGetValue(key, out var readOnlyNext):
-                value = readOnlyNext;
-                return true;
+            case IReadOnlyDictionary<string, object?> readOnlyDictionary:
+                if (readOnlyDictionary.TryGetValue(key, out var readOnlyNext))
+                {
+                    value = readOnlyNext;
+                    return true;
+                }
 
-            case Dictionary<string, object?> dictionary when dictionary.TryGetValue(key, out var dictionaryNext):
-                value = dictionaryNext;
-                return true;
+                foreach (var pair in readOnlyDictionary)
+                {
+                    if (string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = pair.Value;
+                        return true;
+                    }
+                }
+
+                break;
 
             case IEnumerable<KeyValuePair<string, object?>> pairs:
                 foreach (var pair in pairs)
