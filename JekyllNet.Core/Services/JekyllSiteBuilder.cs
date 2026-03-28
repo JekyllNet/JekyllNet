@@ -1539,14 +1539,14 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
                 "Report Email",
                 ":")
             : new FooterLabels(
-                "±¸°¸ºÅ",
-                "¹«°²±¸°¸ºÅ",
-                "ÔöÖµµçÐÅÒµÎñ¾­ÓªÐí¿ÉÖ¤",
-                "·þÎñÌõ¿î",
-                "ÒþË½Õþ²ß",
-                "Î¥·¨ºÍ²»Á¼¾Ù±¨µç»°",
-                "¾Ù±¨ÓÊÏä",
-                "£º");
+                "å¤‡æ¡ˆå·",
+                "å…¬å®‰å¤‡æ¡ˆå·",
+                "å¢žå€¼ç”µä¿¡ä¸šåŠ¡ç»è¥è®¸å¯è¯",
+                "æœåŠ¡æ¡æ¬¾",
+                "éšç§æ”¿ç­–",
+                "è¿æ³•å’Œä¸è‰¯ä¸¾æŠ¥ç”µè¯",
+                "ä¸¾æŠ¥é‚®ç®±",
+                "ï¼š");
     }
 
     private static string ResolvePageLanguage(
@@ -2137,6 +2137,7 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
             Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
             LogInfo(options, $"Compiling Sass {relative} -> {cssRelative}", verboseOnly: true);
             var renderedSource = await RenderSassSourceAsync(file, relative, siteVariables, includes, cancellationToken);
+            renderedSource = NormalizeSassImportPaths(renderedSource, file, includePaths);
             try
             {
                 var result = compiler.Compile(renderedSource, file, destinationPath, sourceMapPath: null, options: new CompilationOptions
@@ -2188,6 +2189,84 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
         }
     }
 
+    private static string NormalizeSassImportPaths(string source, string sourcePath, IReadOnlyList<string> includePaths)
+    {
+        var newline = source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
+        var lines = source.Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n');
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].TrimStart();
+            if (!trimmed.StartsWith("@import ", StringComparison.Ordinal)
+                && !trimmed.StartsWith("@use ", StringComparison.Ordinal)
+                && !trimmed.StartsWith("@forward ", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            lines[i] = Regex.Replace(lines[i], "(['\"])\\./([^'\"]+)\\1", match =>
+            {
+                var importPath = match.Groups[2].Value;
+                return CanResolveSassImportFromCurrentFile(sourcePath, importPath)
+                    || !CanResolveSassImportFromIncludePaths(importPath, includePaths)
+                    ? match.Value
+                    : $"{match.Groups[1].Value}{importPath}{match.Groups[1].Value}";
+            });
+        }
+
+        return string.Join(newline, lines);
+    }
+
+    private static bool CanResolveSassImportFromCurrentFile(string sourcePath, string importPath)
+    {
+        var directory = Path.GetDirectoryName(sourcePath);
+        return !string.IsNullOrWhiteSpace(directory) && SassImportExists(directory, importPath);
+    }
+
+    private static bool CanResolveSassImportFromIncludePaths(string importPath, IReadOnlyList<string> includePaths)
+        => includePaths.Any(path => SassImportExists(path, importPath));
+
+    private static bool SassImportExists(string rootDirectory, string importPath)
+    {
+        var relativePath = importPath.Replace('/', Path.DirectorySeparatorChar);
+        var basePath = Path.Combine(rootDirectory, relativePath);
+        foreach (var candidate in ExpandSassImportCandidates(basePath))
+        {
+            if (File.Exists(candidate))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IEnumerable<string> ExpandSassImportCandidates(string basePath)
+    {
+        yield return basePath;
+
+        if (string.IsNullOrWhiteSpace(Path.GetExtension(basePath)))
+        {
+            yield return basePath + ".scss";
+            yield return basePath + ".sass";
+        }
+
+        var directory = Path.GetDirectoryName(basePath);
+        var fileName = Path.GetFileName(basePath);
+        if (string.IsNullOrWhiteSpace(directory) || string.IsNullOrWhiteSpace(fileName) || fileName.StartsWith("_", StringComparison.Ordinal))
+        {
+            yield break;
+        }
+
+        var partialBasePath = Path.Combine(directory, "_" + fileName);
+        yield return partialBasePath;
+
+        if (string.IsNullOrWhiteSpace(Path.GetExtension(partialBasePath)))
+        {
+            yield return partialBasePath + ".scss";
+            yield return partialBasePath + ".sass";
+        }
+    }
     private static HashSet<string> ReadCollectionDefinitions(Dictionary<string, object?> siteConfig, JekyllSiteOptions options)
     {
         var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
