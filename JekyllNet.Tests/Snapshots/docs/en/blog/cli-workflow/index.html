@@ -92,10 +92,28 @@ dotnet run --project .\JekyllNet.Cli -- serve --source .\docs --port 5055
 <p>The repository now also includes:</p>
 <ul>
 <li><code>dotnet tool</code> packaging metadata for the CLI</li>
-<li>GitHub Actions examples for CI and release artifacts</li>
+<li>a reusable GitHub Action for site builds</li>
+<li>GitHub Actions for CI and release artifacts</li>
 <li>winget packaging templates</li>
 <li>README guidance for installation and upgrades</li>
 </ul>
+<h2 id="reusable-github-action">Reusable GitHub Action</h2>
+<p>The repository root now exposes a build action, so another repository can call JekyllNet without copying the workflow steps by hand.</p>
+<pre><code class="language-yml">jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: &quot;true&quot;
+          artifact-name: docs-site
+</code></pre>
+<p>The repository does not publish a dedicated action tag yet, so the example uses <code>@main</code> for now. Once the first action release exists, pin to that tag instead.</p>
+<p>The most useful inputs are <code>source</code>, <code>destination</code>, <code>drafts</code>, <code>future</code>, <code>unpublished</code>, <code>posts-per-page</code>, and the optional artifact upload controls.</p>
 <h2 id="a-practical-local-routine">A practical local routine</h2>
 <ol>
 <li>Run <code>watch</code> against the site you are editing.</li>

@@ -41,11 +41,30 @@ That keeps the repository easy to inspect because the source and the published P
 
 ## When to use Actions instead
 
-If you want a more explicit build pipeline, the repository now also includes GitHub Actions examples. That route is useful when you want to:
+If you want a more explicit build pipeline, the repository now also includes a reusable JekyllNet build action. That route is useful when you want to:
 
 - build with a pinned .NET SDK in CI
 - publish generated artifacts instead of raw source
 - reuse a workflow for package or release automation
+
+Minimal example:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: "true"
+          artifact-name: docs-site
+```
+
+The repository does not publish a dedicated action tag yet, so the example uses `@main` for now. Move to a release tag once one is available.
 
 The related workflow guidance is summarized in [CLI and Development Workflow](/en/blog/cli-workflow/).
 ---

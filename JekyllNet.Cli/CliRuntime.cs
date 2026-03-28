@@ -15,7 +15,8 @@ internal sealed record BuildCommandSettings(
     bool IncludeDrafts,
     bool IncludeFuture,
     bool IncludeUnpublished,
-    int? PostsPerPage);
+    int? PostsPerPage,
+    bool WriteGitHubOutputDestination);
 
 internal sealed record ServeCommandSettings(
     BuildCommandSettings Build,
@@ -29,6 +30,7 @@ internal static class CliRuntime
     {
         var builder = new JekyllSiteBuilder();
         await builder.BuildAsync(ToSiteOptions(settings), cancellationToken);
+        await WriteGitHubOutputAsync(settings, cancellationToken);
         await output.WriteLineAsync($"Build complete: {settings.DestinationDirectory}");
     }
 
@@ -91,6 +93,30 @@ internal static class CliRuntime
             IncludeUnpublished = settings.IncludeUnpublished,
             PostsPerPage = settings.PostsPerPage
         };
+
+    private static async Task WriteGitHubOutputAsync(BuildCommandSettings settings, CancellationToken cancellationToken)
+    {
+        if (!settings.WriteGitHubOutputDestination)
+        {
+            return;
+        }
+
+        var githubOutputPath = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
+        if (string.IsNullOrWhiteSpace(githubOutputPath))
+        {
+            return;
+        }
+
+        var outputDirectory = Path.GetDirectoryName(githubOutputPath);
+        if (!string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        await using var stream = new FileStream(githubOutputPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+        await using var writer = new StreamWriter(stream);
+        await writer.WriteLineAsync($"destination={settings.DestinationDirectory}".AsMemory(), cancellationToken);
+    }
 
     private static async Task RunWatchLoopAsync(BuildCommandSettings settings, TextWriter output, CancellationToken cancellationToken)
     {

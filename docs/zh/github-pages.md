@@ -39,11 +39,30 @@ baseurl: ""
 
 ## 何时改用 Actions
 
-若君欲令构建可审、可控、可固其版本，则宜用仓库中的 GitHub Actions 示例。此法尤适于：
+若君欲令构建可审、可控、可固其版本，则宜用仓库中可复用之 JekyllNet build action。此法尤适于：
 
 - 固定 CI 中之 .NET SDK 版本
 - 发布生成之产物，而非原始源目录
 - 使站点构建与打包发布共归一套流程
+
+最小示例如下：
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: "true"
+          artifact-name: docs-site
+```
+
+今仓库尚未另发 action 版本 tag，故示例暂用 `@main`；待 release tag 可用时，再改钉其定版。
 
 更详之命令行与自动化说明，可参 [CLI 与开发工作流](/zh/blog/cli-workflow/)。
 ---

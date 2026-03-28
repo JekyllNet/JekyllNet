@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JekyllNet.Cli\JekyllNet.Cli.csproj" />
     <ProjectReference Include="..\JekyllNet.Core\JekyllNet.Core.csproj" />
   </ItemGroup>
 

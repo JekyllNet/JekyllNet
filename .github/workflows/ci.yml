@@ -26,11 +26,19 @@ jobs:
       - name: Test
         run: dotnet test ./JekyllNet.slnx --configuration Release --no-restore
 
-      - name: Build docs site
-        run: dotnet run --project ./JekyllNet.Cli -- build --source ./docs --destination ./artifacts/sites/docs
+      - name: Build docs site with action
+        uses: ./
+        with:
+          source: ./docs
+          destination: ./artifacts/sites/docs
+          setup-dotnet: "false"
 
-      - name: Build sample-site
-        run: dotnet run --project ./JekyllNet.Cli -- build --source ./sample-site --destination ./artifacts/sites/sample-site
+      - name: Build sample-site with action
+        uses: ./
+        with:
+          source: ./sample-site
+          destination: ./artifacts/sites/sample-site
+          setup-dotnet: "false"
 
       - name: Pack dotnet tool
         run: dotnet pack ./JekyllNet.Cli/JekyllNet.Cli.csproj --configuration Release --no-restore --output ./artifacts/nupkg

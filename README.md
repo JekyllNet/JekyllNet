@@ -112,15 +112,56 @@ GitHub 头像建议使用：
 
 ## 🤖 GitHub Actions 与分发
 
-仓库已提供样例 workflow：
+仓库现在同时提供：
 
+- 📄 根目录 `action.yml`，可直接作为可复用 GitHub Action 使用
 - 📄 `.github/workflows/ci.yml`
 - 📄 `.github/workflows/release-artifacts.yml`
 
 用途：
 
-- ⚙️ `ci.yml`：测试、构建 `docs` / `sample-site`、打包 dotnet tool
+- ⚙️ `action.yml`：在任意仓库中构建 JekyllNet 站点，并可选上传构建产物
+- ⚙️ `ci.yml`：测试、通过 action 构建 `docs` / `sample-site`、打包 dotnet tool
 - ⚙️ `release-artifacts.yml`：生成 `nupkg` 与 Windows portable zip，便于 Release 和 `winget`
+
+最小 workflow 示例：
+
+```yml
+name: build-site
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build docs with JekyllNet
+        uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: "true"
+          artifact-name: docs-site
+```
+
+当前仓库尚未打出专门的 action tag，因此示例先使用 `@main`；待首个 action release 发布后，建议改为固定版本 tag。
+
+常用输入：
+
+- `source`
+- `destination`
+- `drafts`
+- `future`
+- `unpublished`
+- `posts-per-page`
+- `upload-artifact`
+- `artifact-name`
 
 ## 🪄 winget
 

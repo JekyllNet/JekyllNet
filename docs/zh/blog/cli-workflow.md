@@ -26,9 +26,33 @@ dotnet run --project .\JekyllNet.Cli -- serve --source .\docs --port 5055
 仓库今亦已具：
 
 - `dotnet tool` 打包元数据
-- GitHub Actions 示例
+- 可复用之 GitHub Action 构建入口
+- GitHub Actions 工作流
 - winget 模板
 - README 中之安装与升级说明
+
+## 可复用之 GitHub Action
+
+今仓库根目录已可直接作为构建 action 为他仓所用，不必每次手写同样之 workflow 细节。
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: "true"
+          artifact-name: docs-site
+```
+
+今仓库尚未另发 action 版本 tag，故示例暂用 `@main`；待首个 action release 既成，宜改钉其固定 tag。
+
+常用输入者，有 `source`、`destination`、`drafts`、`future`、`unpublished`、`posts-per-page`，以及可选之 artifact 上传配置。
 
 ## 一条实用之例行
 

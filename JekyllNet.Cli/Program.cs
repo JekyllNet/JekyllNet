@@ -22,6 +22,7 @@ static Command CreateBuildCommand()
     var futureOption = CreateFutureOption();
     var unpublishedOption = CreateUnpublishedOption();
     var postsPerPageOption = CreatePostsPerPageOption();
+    var githubOutputDestinationOption = CreateGitHubOutputDestinationOption();
 
     var buildCommand = new Command("build", "Build a Jekyll-compatible site")
     {
@@ -30,12 +31,13 @@ static Command CreateBuildCommand()
         draftsOption,
         futureOption,
         unpublishedOption,
-        postsPerPageOption
+        postsPerPageOption,
+        githubOutputDestinationOption
     };
 
     buildCommand.SetAction(async parseResult =>
     {
-        var settings = ReadBuildSettings(parseResult, sourceOption, destinationOption, draftsOption, futureOption, unpublishedOption, postsPerPageOption);
+        var settings = ReadBuildSettings(parseResult, sourceOption, destinationOption, draftsOption, futureOption, unpublishedOption, postsPerPageOption, githubOutputDestinationOption);
         await CliRuntime.BuildOnceAsync(settings, parseResult.InvocationConfiguration.Output, CancellationToken.None);
     });
 
@@ -160,6 +162,14 @@ static Option<int?> CreatePostsPerPageOption()
     return option;
 }
 
+static Option<bool> CreateGitHubOutputDestinationOption()
+{
+    var option = new Option<bool>("--github-output-destination");
+    option.Description = "Write the generated destination path to GITHUB_OUTPUT using the 'destination' output name";
+    option.Hidden = true;
+    return option;
+}
+
 static Option<string?> CreateHostOption()
 {
     var option = new Option<string?>("--host")
@@ -194,10 +204,12 @@ static BuildCommandSettings ReadBuildSettings(
     Option<bool> draftsOption,
     Option<bool> futureOption,
     Option<bool> unpublishedOption,
-    Option<int?> postsPerPageOption)
+    Option<int?> postsPerPageOption,
+    Option<bool>? githubOutputDestinationOption = null)
 {
     var source = parseResult.GetValue(sourceOption)?.FullName ?? Directory.GetCurrentDirectory();
     var destination = parseResult.GetValue(destinationOption)?.FullName ?? Path.Combine(source, "_site");
+    var writeGitHubOutputDestination = githubOutputDestinationOption is not null && parseResult.GetValue(githubOutputDestinationOption);
 
     return new BuildCommandSettings(
         source,
@@ -205,7 +217,8 @@ static BuildCommandSettings ReadBuildSettings(
         parseResult.GetValue(draftsOption),
         parseResult.GetValue(futureOption),
         parseResult.GetValue(unpublishedOption),
-        parseResult.GetValue(postsPerPageOption));
+        parseResult.GetValue(postsPerPageOption),
+        writeGitHubOutputDestination);
 }
 
 static CancellationTokenSource CreateConsoleCancellationTokenSource()

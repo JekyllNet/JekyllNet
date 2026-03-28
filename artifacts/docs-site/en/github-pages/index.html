@@ -98,12 +98,27 @@ baseurl: &quot;&quot;
 <p><code>Deploy from a branch</code> -&gt; <code>main</code> -&gt; <code>/docs</code></p>
 <p>That keeps the repository easy to inspect because the source and the published Pages site live side by side.</p>
 <h2 id="when-to-use-actions-instead">When to use Actions instead</h2>
-<p>If you want a more explicit build pipeline, the repository now also includes GitHub Actions examples. That route is useful when you want to:</p>
+<p>If you want a more explicit build pipeline, the repository now also includes a reusable JekyllNet build action. That route is useful when you want to:</p>
 <ul>
 <li>build with a pinned .NET SDK in CI</li>
 <li>publish generated artifacts instead of raw source</li>
 <li>reuse a workflow for package or release automation</li>
 </ul>
+<p>Minimal example:</p>
+<pre><code class="language-yml">jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: &quot;true&quot;
+          artifact-name: docs-site
+</code></pre>
+<p>The repository does not publish a dedicated action tag yet, so the example uses <code>@main</code> for now. Move to a release tag once one is available.</p>
 <h2 id="the-related-workflow-guidance-is-summarized-in-cli-and-development-workflow">The related workflow guidance is summarized in <a href="/en/blog/cli-workflow/">CLI and Development Workflow</a>.</h2>
 
         </article>

@@ -97,12 +97,27 @@ baseurl: &quot;&quot;
 </code></pre>
 <p>既用独立域名，则 <code>baseurl</code> 宜为空。若后日域名有迁，请同步改此二项，以免生成链接失其所归。</p>
 <h2 id="actions">何时改用 Actions</h2>
-<p>若君欲令构建可审、可控、可固其版本，则宜用仓库中的 GitHub Actions 示例。此法尤适于：</p>
+<p>若君欲令构建可审、可控、可固其版本，则宜用仓库中可复用之 JekyllNet build action。此法尤适于：</p>
 <ul>
 <li>固定 CI 中之 .NET SDK 版本</li>
 <li>发布生成之产物，而非原始源目录</li>
 <li>使站点构建与打包发布共归一套流程</li>
 </ul>
+<p>最小示例如下：</p>
+<pre><code class="language-yml">jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: IoTSharp/JekyllNet@main
+        with:
+          source: ./docs
+          destination: ./artifacts/docs-site
+          upload-artifact: &quot;true&quot;
+          artifact-name: docs-site
+</code></pre>
+<p>今仓库尚未另发 action 版本 tag，故示例暂用 <code>@main</code>；待 release tag 可用时，再改钉其定版。</p>
 <h2 id="cli">更详之命令行与自动化说明，可参 <a href="/zh/blog/cli-workflow/">CLI 与开发工作流</a>。</h2>
 
         </article>
