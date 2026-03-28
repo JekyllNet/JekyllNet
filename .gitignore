@@ -54,3 +54,5 @@ JekyllNet.Tests/Snapshots/
 .DS_Store
 Thumbs.db
 /artifacts
+/.dotnet-home
+/.codex-temp
