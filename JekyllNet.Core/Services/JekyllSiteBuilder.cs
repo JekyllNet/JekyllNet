@@ -2022,10 +2022,12 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
 
         var yaml = await File.ReadAllTextAsync(path, cancellationToken);
         var values = _yamlDeserializer.Deserialize<Dictionary<object, object?>>(yaml) ?? new Dictionary<object, object?>();
-        return values.ToDictionary(
+        var config = values.ToDictionary(
             k => k.Key.ToString() ?? string.Empty,
             v => NormalizeYamlValue(v.Value),
             StringComparer.OrdinalIgnoreCase);
+        ResolveVersionPlaceholders(config);
+        return config;
     }
 
     private async Task<Dictionary<string, string>> LoadNamedTemplatesAsync(
@@ -3133,6 +3135,56 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
             IList<object?> list => list.Select(NormalizeYamlValue).ToList(),
             _ => value
         };
+    }
+
+    /// <summary>
+    /// Resolves <c>{{version}}</c> placeholders in config string values.
+    /// When a YAML object defines a <c>version</c> key, every string value
+    /// within that object (and its nested objects) that contains the literal
+    /// text <c>{{version}}</c> is replaced with the version string.
+    /// This makes JekyllNet compatible with themes such as al-folio that use
+    /// this pattern inside <c>third_party_libraries</c>.
+    /// </summary>
+    private static void ResolveVersionPlaceholders(Dictionary<string, object?> dict, string? inheritedVersion = null)
+    {
+        // A version key on this dict takes precedence over any inherited version.
+        if (dict.TryGetValue("version", out var v) && v is string ownVersion)
+            inheritedVersion = ownVersion;
+
+        foreach (var key in dict.Keys.ToList())
+        {
+            switch (dict[key])
+            {
+                case string s when inheritedVersion is not null && s.Contains("{{version}}"):
+                    dict[key] = s.Replace("{{version}}", inheritedVersion);
+                    break;
+                case Dictionary<string, object?> nested:
+                    ResolveVersionPlaceholders(nested, inheritedVersion);
+                    break;
+                case List<object?> list when inheritedVersion is not null:
+                    ResolveVersionPlaceholdersInList(list, inheritedVersion);
+                    break;
+            }
+        }
+    }
+
+    private static void ResolveVersionPlaceholdersInList(List<object?> list, string version)
+    {
+        for (var i = 0; i < list.Count; i++)
+        {
+            switch (list[i])
+            {
+                case string s when s.Contains("{{version}}"):
+                    list[i] = s.Replace("{{version}}", version);
+                    break;
+                case Dictionary<string, object?> nested:
+                    ResolveVersionPlaceholders(nested, version);
+                    break;
+                case List<object?> nestedList:
+                    ResolveVersionPlaceholdersInList(nestedList, version);
+                    break;
+            }
+        }
     }
 
     private static void LogInfo(JekyllSiteOptions options, string message, bool verboseOnly = false)
