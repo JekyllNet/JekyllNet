@@ -1230,6 +1230,46 @@ public sealed class SiteBuilderBehaviorTests
         Assert.Contains("none", output, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task Build_ResolvesVersionPlaceholders_InThirdPartyLibraryUrls()
+    {
+        var sourceDirectory = TestInfrastructure.CreateSiteFixture(new Dictionary<string, string>
+        {
+            ["_config.yml"] = """
+                third_party_libraries:
+                  mdb:
+                    version: "4.20.0"
+                    url:
+                      css: "https://cdn.jsdelivr.net/npm/mdbootstrap@{{version}}/css/mdb.min.css"
+                      js: "https://cdn.jsdelivr.net/npm/mdbootstrap@{{version}}/js/mdb.min.js"
+                  mathjax:
+                    version: "3.2.2"
+                    url:
+                      js: "https://cdn.jsdelivr.net/npm/mathjax@{{version}}/es5/tex-mml-chtml.js"
+                """,
+            ["_layouts/default.html"] = """
+                {{ content }}
+                """,
+            ["index.html"] = """
+                ---
+                layout: default
+                ---
+                {{ site.third_party_libraries.mdb.url.css }}
+                {{ site.third_party_libraries.mdb.url.js }}
+                {{ site.third_party_libraries.mathjax.url.js }}
+                """
+        });
+
+        var outputDirectory = await TestInfrastructure.BuildSiteAsync(sourceDirectory);
+        var output = await File.ReadAllTextAsync(Path.Combine(outputDirectory, "index.html"));
+
+        Assert.Contains("mdbootstrap@4.20.0/css/mdb.min.css", output, StringComparison.Ordinal);
+        Assert.Contains("mdbootstrap@4.20.0/js/mdb.min.js", output, StringComparison.Ordinal);
+        Assert.Contains("mathjax@3.2.2/es5/tex-mml-chtml.js", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("{{version}}", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("%7B%7Bversion%7D%7D", output, StringComparison.Ordinal);
+    }
+
     private static string CreateContentSiteFixture()
     {
         return TestInfrastructure.CreateSiteFixture(new Dictionary<string, string>
