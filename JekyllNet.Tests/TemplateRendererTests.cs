@@ -136,6 +136,40 @@ public sealed class TemplateRendererTests
 
         Assert.Equal("@use 'main';", output);
     }
+
+    [Fact]
+    public void IfCondition_SupportsLogicalAnd()
+    {
+        const string template = "{% if site.color_scheme and site.color_scheme != 'nil' %}configured{% else %}fallback{% endif %}";
+
+        var output = _renderer.Render(template, new Dictionary<string, object?>
+        {
+            ["site"] = new Dictionary<string, object?>
+            {
+                ["color_scheme"] = "nil"
+            }
+        });
+
+        Assert.Equal("fallback", output.Trim());
+    }
+
+    [Fact]
+    public void IfCondition_SupportsLogicalOr()
+    {
+        const string template = "{% if page.enabled or page.preview %}visible{% else %}hidden{% endif %}";
+
+        var output = _renderer.Render(template, new Dictionary<string, object?>
+        {
+            ["page"] = new Dictionary<string, object?>
+            {
+                ["enabled"] = false,
+                ["preview"] = true
+            }
+        });
+
+        Assert.Equal("visible", output.Trim());
+    }
+
     [Fact]
     public void ForLoop_SupportsLimitOffsetAndMetadata()
     {

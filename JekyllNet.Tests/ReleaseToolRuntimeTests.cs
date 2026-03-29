@@ -5,6 +5,41 @@ namespace JekyllNet.Tests;
 public sealed class ReleaseToolRuntimeTests
 {
     [Fact]
+    public void ResolveThemeTargets_UsesDefaultFiveThemes_WhenSelectionIsEmpty()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+
+        var targets = ReleaseToolRuntime.ResolveThemeTargets(repoRoot, null);
+
+        Assert.Equal(5, targets.Count);
+        Assert.Contains(targets, static target => target.Name == "jekyll-theme-chirpy");
+        Assert.Contains(targets, static target => target.Name == "minimal-mistakes");
+        Assert.Contains(targets, static target => target.Name == "al-folio");
+        Assert.Contains(targets, static target => target.Name == "jekyll-TeXt-theme");
+        Assert.Contains(targets, static target => target.Name == "just-the-docs");
+    }
+
+    [Fact]
+    public void ResolveThemeTargets_ThrowsForUnknownTheme()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+
+        Assert.Throws<ArgumentException>(() => ReleaseToolRuntime.ResolveThemeTargets(repoRoot, ["unknown-theme"]));
+    }
+
+    [Fact]
+    public void ResolveThemeTargets_RemovesDuplicateThemes()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+
+        var targets = ReleaseToolRuntime.ResolveThemeTargets(repoRoot, ["al-folio", "AL-FOLIO", "just-the-docs"]);
+
+        Assert.Equal(2, targets.Count);
+        Assert.Equal("al-folio", targets[0].Name);
+        Assert.Equal("just-the-docs", targets[1].Name);
+    }
+
+    [Fact]
     public async Task ResolveVersion_UsesProjectVersion_WhenManualInputIsMissing()
     {
         var projectPath = Path.Combine(Path.GetTempPath(), "JekyllNet.Tests", Guid.NewGuid().ToString("N"), "Tool.csproj");

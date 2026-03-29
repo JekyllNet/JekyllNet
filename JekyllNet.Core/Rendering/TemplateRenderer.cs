@@ -1099,6 +1099,18 @@ public sealed partial class TemplateRenderer
 
     private static bool EvaluateCondition(string expression, IReadOnlyDictionary<string, object?> variables)
     {
+        var orSegments = SplitConditionByOperator(expression, "or");
+        if (orSegments.Count > 1)
+        {
+            return orSegments.Any(segment => EvaluateCondition(segment, variables));
+        }
+
+        var andSegments = SplitConditionByOperator(expression, "and");
+        if (andSegments.Count > 1)
+        {
+            return andSegments.All(segment => EvaluateCondition(segment, variables));
+        }
+
         if (expression.Contains(" contains ", StringComparison.Ordinal))
         {
             var parts = expression.Split(" contains ", 2, StringSplitOptions.TrimEntries);
@@ -1135,6 +1147,69 @@ public sealed partial class TemplateRenderer
             IEnumerable<object?> e => e.Any(),
             _ => true
         };
+    }
+
+    private static List<string> SplitConditionByOperator(string expression, string operatorToken)
+    {
+        var parts = new List<string>();
+        if (string.IsNullOrWhiteSpace(expression))
+        {
+            return parts;
+        }
+
+        var current = new System.Text.StringBuilder();
+        char? quote = null;
+        var index = 0;
+        var marker = $" {operatorToken} ";
+
+        while (index < expression.Length)
+        {
+            var ch = expression[index];
+            if (quote is null && ch is '\'' or '"')
+            {
+                quote = ch;
+                current.Append(ch);
+                index++;
+                continue;
+            }
+
+            if (quote is not null)
+            {
+                current.Append(ch);
+                if (ch == quote)
+                {
+                    quote = null;
+                }
+
+                index++;
+                continue;
+            }
+
+            if (index + marker.Length <= expression.Length
+                && string.Equals(expression.Substring(index, marker.Length), marker, StringComparison.OrdinalIgnoreCase))
+            {
+                var segment = current.ToString().Trim();
+                if (segment.Length > 0)
+                {
+                    parts.Add(segment);
+                }
+
+                current.Clear();
+                index += marker.Length;
+                continue;
+            }
+
+            current.Append(ch);
+            index++;
+        }
+
+        var tail = current.ToString().Trim();
+        if (tail.Length > 0)
+        {
+            parts.Add(tail);
+        }
+
+        return parts;
     }
 
     private static bool BranchMatches(string? targetValue, string whenExpression, IReadOnlyDictionary<string, object?> variables)

@@ -4,12 +4,14 @@ using JekyllNet.ReleaseTool;
 var resolveVersionCommand = CreateResolveVersionCommand();
 var writeSha256Command = CreateWriteSha256Command();
 var exportWingetManifestCommand = CreateExportWingetManifestCommand();
+var testThemeMatrixCommand = CreateTestThemeMatrixCommand();
 
 var rootCommand = new RootCommand("JekyllNet release automation helpers")
 {
     resolveVersionCommand,
     writeSha256Command,
-    exportWingetManifestCommand
+    exportWingetManifestCommand,
+    testThemeMatrixCommand
 };
 
 return await rootCommand.Parse(args).InvokeAsync();
@@ -161,6 +163,63 @@ static Command CreateExportWingetManifestCommand()
             parseResult.GetValue(outputDirectoryOption)?.FullName);
 
         await ReleaseToolRuntime.ExportWingetManifestAsync(settings, parseResult.InvocationConfiguration.Output, CancellationToken.None);
+    });
+
+    return command;
+}
+
+static Command CreateTestThemeMatrixCommand()
+{
+    var themesOption = new Option<string[]>("--themes")
+    {
+        Description = "Theme names to build and validate. Defaults to the standard 5-theme matrix."
+    };
+    themesOption.AllowMultipleArgumentsPerToken = true;
+
+    var configurationOption = new Option<string?>("--configuration")
+    {
+        Description = "Build configuration used when compiling the CLI."
+    };
+
+    var portStartOption = new Option<int?>("--port-start")
+    {
+        Description = "Starting HTTP port for static site browser checks."
+    };
+
+    var debugPortStartOption = new Option<int?>("--debug-port-start")
+    {
+        Description = "Starting DevTools remote debugging port for Edge browser checks."
+    };
+
+    var maxParallelismOption = new Option<int?>("--max-parallelism")
+    {
+        Description = "Maximum parallel build workers. Defaults to the number of selected themes."
+    };
+
+    var command = new Command("test-theme-matrix", "Build themes in parallel and run browser error checks")
+    {
+        themesOption,
+        configurationOption,
+        portStartOption,
+        debugPortStartOption,
+        maxParallelismOption
+    };
+
+    command.SetAction(async parseResult =>
+    {
+        var selectedThemes = parseResult.GetValue(themesOption);
+        var settings = new ThemeMatrixSettings(
+            selectedThemes is { Length: > 0 } ? selectedThemes : null,
+            parseResult.GetValue(configurationOption) ?? "Release",
+            parseResult.GetValue(portStartOption) ?? 5100,
+            parseResult.GetValue(debugPortStartOption) ?? 9222,
+            parseResult.GetValue(maxParallelismOption));
+
+        var success = await ReleaseToolRuntime.TestThemeMatrixAsync(settings, parseResult.InvocationConfiguration.Output, CancellationToken.None);
+        if (!success)
+        {
+            throw new InvalidOperationException("Theme matrix validation failed.");
+        }
     });
 
     return command;

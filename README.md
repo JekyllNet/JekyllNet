@@ -93,6 +93,16 @@ GitHub 头像建议使用：
 
 `dotnet test .\JekyllNet.slnx`
 
+运行 5 主题并行构建 + 浏览器错误检查（C# 工具实现）：
+
+`dotnet run --project .\scripts\JekyllNet.ReleaseTool -- test-theme-matrix --max-parallelism 5`
+
+说明：
+
+- 会并行构建 `jekyll-theme-chirpy`、`minimal-mistakes`、`al-folio`、`jekyll-TeXt-theme`、`just-the-docs`
+- 会启动无头浏览器检查控制台/运行时/网络错误
+- 会输出每个主题的构建耗时与总耗时
+
 ## 📦 dotnet tool
 
 仓库已经带上 `dotnet tool` 打包元数据，命令名为：

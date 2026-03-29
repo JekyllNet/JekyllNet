@@ -1862,6 +1862,12 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
                     };
                     var rendered = _templateRenderer.Render(file.Content, variables, context.Includes);
                     rendered = ApplyAutomaticSiteEnhancements(rendered, file.OutputRelativePath, context.SiteConfig, page);
+
+                    if (IsCssFile(file.OutputRelativePath))
+                    {
+                        rendered = CompileFrontMatterCss(file, rendered);
+                    }
+
                     await File.WriteAllTextAsync(destinationPath, rendered, cancellationToken);
                     continue;
                 }
@@ -2140,10 +2146,15 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
             renderedSource = NormalizeSassImportPaths(renderedSource, file, includePaths);
             try
             {
-                var result = compiler.Compile(renderedSource, file, destinationPath, sourceMapPath: null, options: new CompilationOptions
+                var compilationOptions = new CompilationOptions
                 {
                     IncludePaths = includePaths
-                });
+                };
+
+                var result = string.Equals(Path.GetExtension(file), ".css", StringComparison.OrdinalIgnoreCase)
+                    ? compiler.Compile(renderedSource, indentedSyntax: false, options: compilationOptions)
+                    : compiler.Compile(renderedSource, file, destinationPath, sourceMapPath: null, options: compilationOptions);
+
                 await File.WriteAllTextAsync(destinationPath, result.CompiledContent, cancellationToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
@@ -3002,6 +3013,70 @@ _czc.push(["_setAccount", "{{escapedId}}"]);
     private static bool IsSassFile(string path)
         => path.EndsWith(".scss", StringComparison.OrdinalIgnoreCase)
            || path.EndsWith(".sass", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsCssFile(string path)
+        => path.EndsWith(".css", StringComparison.OrdinalIgnoreCase);
+
+    private static string CompileFrontMatterCss(JekyllStaticFile file, string rendered)
+    {
+        if (string.IsNullOrWhiteSpace(rendered))
+        {
+            return rendered;
+        }
+
+        var rootDirectory = ResolveStaticFileRootDirectory(file);
+        if (string.IsNullOrWhiteSpace(rootDirectory))
+        {
+            return rendered;
+        }
+
+        var inheritedThemeDirectories = ResolveInheritedThemeDirectories(rootDirectory);
+        var includePaths = inheritedThemeDirectories
+            .Concat([rootDirectory])
+            .Select(directory => Path.Combine(directory, "_sass"))
+            .Where(Directory.Exists)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (includePaths.Count == 0)
+        {
+            return rendered;
+        }
+
+        try
+        {
+            var normalizedSource = NormalizeSassImportPaths(rendered, file.SourcePath, includePaths);
+            var compiler = new SassCompiler();
+            var result = compiler.Compile(normalizedSource, indentedSyntax: false, options: new CompilationOptions
+            {
+                IncludePaths = includePaths
+            });
+
+            return result.CompiledContent;
+        }
+        catch
+        {
+            return rendered;
+        }
+    }
+
+    private static string? ResolveStaticFileRootDirectory(JekyllStaticFile file)
+    {
+        if (string.IsNullOrWhiteSpace(file.SourcePath) || string.IsNullOrWhiteSpace(file.RelativePath))
+        {
+            return null;
+        }
+
+        var sourcePath = Path.GetFullPath(file.SourcePath);
+        var relativePath = file.RelativePath.Replace('/', Path.DirectorySeparatorChar);
+        if (!sourcePath.EndsWith(relativePath, StringComparison.OrdinalIgnoreCase))
+        {
+            return Path.GetDirectoryName(sourcePath);
+        }
+
+        var rootLength = sourcePath.Length - relativePath.Length;
+        return sourcePath[..rootLength].TrimEnd(Path.DirectorySeparatorChar);
+    }
 
     private static bool IsContentFile(string path)
         => path.EndsWith(".md", StringComparison.OrdinalIgnoreCase)
