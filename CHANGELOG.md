@@ -43,7 +43,30 @@
 - ✅ `dotnet pack .\JekyllNet.Cli\JekyllNet.Cli.csproj -c Release`
 - ✅ `serve` 本地预览链路可用
 
-## 🔭 Next
+## � [0.1.0-post] - 修复与改进
+
+### 🛠️ Changed
+
+- 🛠️ **Sass/SCSS 编译要求**：Sass 入口文件现在 **必须** 包含 YAML Front Matter（`---\n---`）头，以启用编译。这确保了与 Jekyll 的一致性。参考：[sample-site/assets/scss/site.scss](sample-site/assets/scss/site.scss)
+- 🛠️ **CLI 日志体验改进**：所有 CLI 命令（`build`、`watch`、`serve`）现在输出更结构化、易读的日志：
+  - 带 emoji 标记的 status 指示（✅ 成功、❌ 失败、🚀 启动、👀 监听、📝 更改）
+  - 智能时间格式化（`ms` / `s` / `mm:ss`）
+  - 多行格式化输出，便于快速扫描
+
+示例输出：
+```
+✅ Build complete: D:\source\JekyllNet\artifacts\sites\sample-site (elapsed 00:00:02.542)
+👀 Watching for changes in D:\source\JekyllNet\sample-site
+📝 Change detected: _posts\2024-01-01-test.md
+```
+
+### ✅ Verified
+
+- ✅ 所有 64 个单元测试通过
+- ✅ `dotnet test .\JekyllNet.slnx` 无错误无警告
+- ✅ 5 主题矩阵构建成功：`dotnet run --project .\scripts\JekyllNet.ReleaseTool -- test-theme-matrix --max-parallelism 5`
+
+## �🔭 Next
 
 - 💡 继续补齐更细的 Liquid / Pagination 边角兼容
 - 💡 推进 VS Code / Visual Studio 预览与构建体验

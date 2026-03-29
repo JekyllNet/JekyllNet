@@ -54,7 +54,7 @@ The site-building layer also covers:
 - baseline pagination with `paginate` and `paginate_path`
 - nested config keys such as `pagination.per_page` and `pagination.path`
 - per-page pagination disable
-- Sass and SCSS compilation
+- **Sass and SCSS compilation** (entry files must include YAML Front Matter: `---\n---`)
 - static asset copying
 - fixture-based build regression tests for both `sample-site` and `docs`
 

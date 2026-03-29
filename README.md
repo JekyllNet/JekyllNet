@@ -318,3 +318,221 @@ terms:
 - ⏳ data JSON 结构化解析增强
 - ⏳ Sass 管道与 Jekyll 细节完全对齐
 - ⏳ GitHub Pages 固定版本与插件行为 1:1 兼容
+
+## 🎨 Sass/SCSS 编译
+
+JekyllNet 支持 Sass/SCSS 文件自动编译为 CSS。**重要：Sass 入口文件必须包含 YAML Front Matter 头**，以启用编译。
+
+示例 Sass 文件结构：
+
+```scss
+---
+---
+// 此处开始编写 Sass/SCSS
+$primary-color: #333;
+
+body {
+  color: $primary-color;
+}
+```
+
+- 📄 Front Matter 可以为空（`---\n---`）
+- 📄 支持 `@import` 引入其他 Sass 文件
+- 📄 编译输出会放在 `_site/` 对应路径下，扩展名改为 `.css`
+
+示例：
+
+- 输入：`assets/scss/style.scss`
+- 输出：`_site/assets/css/style.css`
+
+## 📋 CLI 日志输出
+
+JekyllNet CLI 提供结构化、易读的输出格式，包括 emoji 状态指示和智能时间格式化。
+
+### 构建完成示例
+
+```
+✅ Build complete: D:\projects\my-site (elapsed 00:00:02.542)
+```
+
+### 监听模式示例
+
+```
+👀 Watching for changes in D:\projects\my-site
+📝 Change detected: _posts\2024-01-01-post.md
+✅ Build complete (elapsed 00:00:01.234)
+📝 Change detected: _config.yml
+✅ Build complete (elapsed 00:00:03.456)
+```
+
+### 服务模式示例
+
+```
+🚀 Starting server at http://localhost:4000
+👀 Watching for changes
+📝 Change detected: index.md
+✅ Rebuild complete (elapsed 00:00:00.789)
+```
+
+### 日志标记含义
+
+- ✅ 成功完成
+- ❌ 失败或错误
+- 🚀 启动或开始
+- 👀 监听或观察
+- 📝 文件变更
+
+### 时间格式化
+
+- 小于 1 秒：`123 ms`
+- 1 秒到 59 秒：`2.5 s`
+- 1 分钟及以上：`01:23` (分:秒)
+
+## 🔧 安装与使用
+
+### 系统要求
+
+- `.NET 10` SDK 或更高版本
+- Windows / macOS / Linux
+
+### 从源代码本地安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/JekyllNet/JekyllNet.git
+cd JekyllNet
+
+# 本地打包
+dotnet pack .\JekyllNet.Cli\JekyllNet.Cli.csproj -c Release
+
+# 从本地源安装为全局工具
+dotnet tool install --global JekyllNet --add-source .\artifacts\nupkg
+
+# 或升级现有版本
+dotnet tool update --global JekyllNet --add-source .\artifacts\nupkg
+```
+
+### 使用全局 dotnet tool
+
+```bash
+# 构建站点
+jekyllnet build --source ./my-site
+
+# 启动本地服务
+jekyllnet serve --source ./my-site --port 4000
+
+# 监听改动
+jekyllnet watch --source ./my-site --drafts
+```
+
+### 从本仓库运行
+
+```bash
+# 构建
+dotnet run --project .\JekyllNet.Cli -- build --source .\sample-site
+
+# 服务
+dotnet run --project .\JekyllNet.Cli -- serve --source .\docs
+
+# 监听
+dotnet run --project .\JekyllNet.Cli -- watch --source .\sample-site --drafts
+```
+
+## 🐛 故障排除
+
+### Sass 编译失败：文件未生成
+
+**症状**：`_site/` 中看不到 `.css` 文件
+
+**解决方案**：确保 Sass 入口文件包含 YAML Front Matter：
+
+```scss
+---
+---
+$color: red;
+body { color: $color; }
+```
+
+### 构建卡住或缓慢
+
+**可能原因**：
+- 大量 AI 翻译请求
+- 网络连接问题
+- 大型 Markdown 文件集合
+
+**解决方案**：
+- 使用 `--no-ai` 或关闭 `_config.yml` 中的 AI 翻译
+- 检查网络连接
+- 考虑使用 `--drafts false` 排除草稿
+
+### 404 或路由错误
+
+**可能原因**：
+- Permalink 配置不正确
+- URL 首位缺少 `/`
+
+**检查**：
+- 验证 `_config.yml` 中的 `url` 和 `baseurl`
+- 检查 front matter 中的 `permalink` 配置
+
+### 模板渲染错误
+
+**症状**：Liquid 变量未取值或条件语句失效
+
+**检查清单**：
+1. 验证变量拼写与作用域（全局 vs 页面 vs 循环）
+2. 检查 `includes` 路径是否正确
+3. 测试 Liquid `debug` filter：`{{ variable | debug }}`
+
+## 📝 贡献指南
+
+欢迎提交 Issue 和 Pull Request！
+
+### 开发流程
+
+1. **Fork** 此仓库
+2. **创建特性分支**：`git checkout -b feature/your-feature`
+3. **在本地验证**：
+   ```bash
+   dotnet test .\JekyllNet.slnx
+   dotnet run --project .\scripts\JekyllNet.ReleaseTool -- test-theme-matrix
+   ```
+4. **提交 PR**，描述改动内容和测试验证方式
+
+### 代码风格
+
+- 遵循 [C# 编码标准](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- 使用 `.NET 10` 特性（records、pattern matching 等）
+- 添加单元测试覆盖新功能
+
+### 测试要求
+
+- 所有新功能必须包含单元测试
+- 运行 `dotnet test .\JekyllNet.slnx` 确保无失败
+- 如涉及主题兼容性，运行 5 主题矩阵测试
+
+### 文档更新
+
+- 更新 `CHANGELOG.md`：在合并前添加条目
+- 更新 `ROADMAP.md`：如涉及阶段进展
+- 更新 `README.md`：如新增功能或改变行为
+
+### 提交信息格式
+
+推荐使用清晰的提交信息：
+
+```
+feat: add Sass compilation support
+fix: resolve pagination edge case
+docs: update README with CLI examples
+```
+
+## 📄 许可证
+
+此项目采用 [MIT License](LICENSE)。
+
+## 🔗 链接
+
+- 📚 文档：https://jekyllnet.help
+- 🐛 Issue 追踪：https://github.com/JekyllNet/JekyllNet/issues
+- 📢 Discussions：https://github.com/JekyllNet/JekyllNet/discussions

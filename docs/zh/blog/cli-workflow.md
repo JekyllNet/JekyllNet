@@ -21,6 +21,23 @@ dotnet run --project .\JekyllNet.Cli -- serve --source .\docs --port 5055
 - `watch`：适于文稿与模板反复修订
 - `serve`：适于稳定本地预览
 
+## 结构化日志输出
+
+近日之改进，使得 CLI 输出易读许多：
+
+- **Emoji 状态标记**：✅ 成功、❌ 失败、🚀 启动、👀 监听、📝 变更
+- **智能时间格式**：`ms` 表毫秒、`s` 表秒、`mm:ss` 表分钟
+- **多行排版**：一览便知
+
+输出示例：
+
+```
+✅ Build complete: D:\projects\my-site (elapsed 00:00:02.542)
+👀 Watching for changes in D:\projects\my-site
+📝 Change detected: _posts\2024-01-01-post.md
+✅ Rebuild complete (elapsed 00:00:01.234)
+```
+
 ## 打包与分发
 
 仓库今亦已具：

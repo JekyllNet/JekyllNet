@@ -54,7 +54,7 @@ nav_key: "blog"
 - 基础分页：`paginate` 与 `paginate_path`
 - 嵌套分页配置：`pagination.per_page` 与 `pagination.path`
 - 按页禁用分页
-- Sass / SCSS 编译
+- **Sass / SCSS 编译**（入口文件需包含 YAML Front Matter：`---\n---`）
 - 静态资源复制
 - `docs` 与 `sample-site` 之基于 fixture 的构建回归测试
 

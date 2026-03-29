@@ -28,9 +28,10 @@
 
 ## 🚀 当前基线
 
-截至 2026-03-25，当前仓库已经稳定具备：
+截至 2026-03-25 至今，当前仓库已经稳定具备：
 
 - ✨ `build` 命令可生成 `sample-site` 与 `docs`
+- ✨ `watch` 与 `serve` 命令支持自动监听与本地预览
 - ✨ `_config.yml`
 - ✨ YAML Front Matter
 - ✨ Markdown 转 HTML
@@ -41,7 +42,7 @@
 - ✨ `collections`
 - ✨ `tags/categories`
 - ✨ 一批基础 Liquid 标签与常见 filters
-- ✨ Sass/SCSS 编译
+- ✨ **Sass/SCSS 编译**（入口文件需包含 YAML Front Matter）
 - ✨ 静态资源复制到 `_site`
 - ✨ `_config.yml defaults`
 - ✨ `drafts / future / unpublished`
@@ -56,10 +57,17 @@
 - ✨ OpenAI / DeepSeek / Ollama / 任意 OpenAI-compatible 第三方 provider
 - ✨ AI 翻译缓存、增量翻译、glossary
 - ✨ 兼容矩阵与公开边界说明页
+- ✨ **结构化 CLI 日志输出**（emoji 状态指示、智能时间格式化、易于扫描的格式）
 
 验证命令：
 
 `dotnet test .\JekyllNet.slnx`
+
+完整用户指南：
+
+- 📚 `README.md`：安装、快速开始、CLI 用法、故障排除
+- 📚 `docs/`：完整文档站点，包括兼容性矩阵、部署指南、AI 翻译配置
+- 📚 `CHANGELOG.md`：版本变更历史与修复记录
 
 ## 🧪 Phase 0：回归基线
 

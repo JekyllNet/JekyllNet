@@ -21,6 +21,23 @@ dotnet run --project .\JekyllNet.Cli -- serve --source .\docs --port 5055
 - `watch` is for content or template editing loops.
 - `serve` is for local preview with a stable HTTP endpoint.
 
+## Structured log output
+
+Recent improvements have made CLI output much more readable:
+
+- **Emoji status indicators**: ✅ for success, ❌ for errors, 🚀 for startup, 👀 for watching, 📝 for changes
+- **Smart time formatting**: Shows `ms` for milliseconds, `s` for seconds, `mm:ss` for longer durations
+- **Multi-line format**: Easier to scan at a glance
+
+Example output:
+
+```
+✅ Build complete: D:\projects\my-site (elapsed 00:00:02.542)
+👀 Watching for changes in D:\projects\my-site
+📝 Change detected: _posts\2024-01-01-post.md
+✅ Rebuild complete (elapsed 00:00:01.234)
+```
+
 ## Tooling and distribution
 
 The repository now also includes:

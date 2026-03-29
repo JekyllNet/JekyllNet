@@ -43,6 +43,7 @@ internal static class CliRuntime
             await WriteGitHubOutputAsync(settings, cancellationToken);
             stopwatch.Stop();
             var elapsed = FormatElapsedTime(stopwatch.Elapsed);
+            await output.WriteLineAsync($"Build complete: {settings.DestinationDirectory}");
             await output.WriteLineAsync();
             await output.WriteLineAsync("✅ Build Complete");
             await output.WriteLineAsync($"   Output Directory: {settings.DestinationDirectory}");
