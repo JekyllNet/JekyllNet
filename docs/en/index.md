@@ -54,6 +54,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "Use the full handbook"
+        description: "Follow one practical guide from setup to release and troubleshooting."
+        url: /en/blog/complete-usage-guide/
       - title: "Get unblocked fast"
         description: "Run your first build, inspect output, and move to local preview."
         url: /en/getting-started/
@@ -72,6 +75,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "Complete usage guide"
+        description: "A single practical handbook for setup, development loops, publishing, and troubleshooting."
+        url: /en/blog/complete-usage-guide/
       - label: "Feature overview"
         description: "A practical tour of rendering, publishing, filters, pagination, and output stability."
         url: /en/blog/feature-overview/
@@ -87,4 +93,7 @@ sections:
       - label: "Launch announcement"
         description: "What shipped in the first public milestone on March 25, 2026."
         url: /en/news/project-status/
+      - label: "v0.2.0 release note"
+        description: "The latest release update with official project links and adoption guidance."
+        url: /en/news/v0-2-0/
 ---

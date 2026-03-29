@@ -54,6 +54,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "完整使用说明"
+        description: "一篇跑通安装、构建、预览、翻译、发布与排错。"
+        url: /zh/blog/complete-usage-guide/
       - title: "先试其行"
         description: "先本地构建一次，再观输出与预览。"
         url: /zh/getting-started/
@@ -72,6 +75,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "完整使用说明"
+        description: "以实战路径总览今之工具链。"
+        url: /zh/blog/complete-usage-guide/
       - label: "特性总览"
         description: "综述渲染、发布语义、分页、Filters 与回归测试。"
         url: /zh/blog/feature-overview/
@@ -87,4 +93,7 @@ sections:
       - label: "首发新闻"
         description: "观 2026 年 3 月 25 日里程碑所成。"
         url: /zh/news/project-status/
+      - label: "v0.2.0 发布新闻"
+        description: "观本轮文档体系升级与对外发布稿。"
+        url: /zh/news/v0-2-0/
 ---

@@ -5,8 +5,6 @@ permalink: /zh/blog/cli-workflow/
 lang: "zh-CN"
 nav_key: "blog"
 ---
-# CLI 与开发工作流
-
 吾今已有较完备之命令行工作流。盖静态生成器若仅能 build，而不能便于迭代、预览、打包与自动化，则其用未广。
 
 ## 核心三令
@@ -31,7 +29,7 @@ dotnet run --project .\JekyllNet.Cli -- serve --source .\docs --port 5055
 
 输出示例：
 
-```
+```text
 ✅ Build complete: D:\projects\my-site (elapsed 00:00:02.542)
 👀 Watching for changes in D:\projects\my-site
 📝 Change detected: _posts\2024-01-01-post.md
@@ -59,7 +57,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: JekyllNet/action@main
+      - uses: JekyllNet/action@v2
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -67,7 +65,7 @@ jobs:
           artifact-name: docs-site
 ```
 
-今仓库尚未另发 action 版本 tag，故示例暂用 `@main`；待首个 action release 既成，宜改钉其固定 tag。
+  今 action 已发布 `v2` 标签，默认安装之 JekyllNet CLI 版本为 `0.2.0`。
 
 常用输入者，有 `source`、`destination`、`drafts`、`future`、`unpublished`、`posts-per-page`、`dotnet-configuration`，以及可选之 artifact 上传配置。
 
@@ -89,4 +87,4 @@ jobs:
 1. 修站点时，常开 `watch`。
 2. 欲得稳定预览地址时，再开 `serve`。
 3. 提交前，行 `dotnet test .\JekyllNet.slnx`。
----
+

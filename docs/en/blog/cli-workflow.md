@@ -5,8 +5,6 @@ permalink: /en/blog/cli-workflow/
 lang: "en"
 nav_key: "blog"
 ---
-# CLI and Development Workflow
-
 JekyllNet now has a fuller command-line story. That matters because a generator becomes much easier to evaluate once local iteration, preview, packaging, and CI all fit together.
 
 ## The core commands
@@ -31,7 +29,7 @@ Recent improvements have made CLI output much more readable:
 
 Example output:
 
-```
+```text
 ✅ Build complete: D:\projects\my-site (elapsed 00:00:02.542)
 👀 Watching for changes in D:\projects\my-site
 📝 Change detected: _posts\2024-01-01-post.md
@@ -59,7 +57,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: JekyllNet/action@main
+      - uses: JekyllNet/action@v2
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -67,7 +65,7 @@ jobs:
           artifact-name: docs-site
 ```
 
-The repository does not publish a dedicated action tag yet, so the example uses `@main` for now. Once the first action release exists, pin to that tag instead.
+  The action now publishes the `v2` tag, which installs JekyllNet `0.2.0` by default.
 
 The most useful inputs are `source`, `destination`, `drafts`, `future`, `unpublished`, `posts-per-page`, `dotnet-configuration`, and the optional artifact upload controls.
 
@@ -89,4 +87,4 @@ That workflow:
 1. Run `watch` against the site you are editing.
 2. Use `serve` when you want a stable preview URL.
 3. Run `dotnet test .\JekyllNet.slnx` before landing changes.
----
+

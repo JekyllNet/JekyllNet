@@ -5,8 +5,6 @@ permalink: /en/github-pages/
 lang: "en"
 nav_key: "docs"
 ---
-# Deployment
-
 The repository now includes a `docs` directory shaped to work as a GitHub Pages style source site. It also serves as one of the project's real build fixtures, which makes it a useful reference for your own documentation repositories.
 
 ## Directory role
@@ -56,7 +54,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: JekyllNet/action@main
+      - uses: JekyllNet/action@v2
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -64,7 +62,7 @@ jobs:
           artifact-name: docs-site
 ```
 
-The repository does not publish a dedicated action tag yet, so the example uses `@main` for now. Move to a release tag once one is available.
+  The action now publishes the `v2` tag, which installs JekyllNet `0.2.0` by default.
 
 ## Built-in Pages workflow in this repository
 
@@ -80,4 +78,3 @@ That workflow:
 It is wired to changes in `docs/**`, `JekyllNet.Cli/**`, `JekyllNet.Core/**`, `JekyllNet.slnx`, and the workflow file itself, so documentation and generator changes both refresh the published site.
 
 The related workflow guidance is summarized in [CLI and Development Workflow](/en/blog/cli-workflow/).
----

@@ -34,6 +34,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "完整使用说明"
+        description: "从安装到发布的一站式总册。"
+        url: /zh/blog/complete-usage-guide/
       - title: "特性"
         description: "综观渲染、发布语义、分页与 Filters。"
         url: /zh/blog/feature-overview/
@@ -46,6 +49,24 @@ sections:
       - title: "AI 翻译"
         description: "述多语、provider、缓存、增量与 glossary。"
         url: /zh/blog/ai-translation/
+  - title: "按分类速查"
+    description: "若以职能或阶段分工，可循此取径。"
+    variant: "quick-links"
+    columns: 4
+    section_class: ""
+    items:
+      - title: "安装与起步"
+        description: "适合首次接入项目成员。"
+        url: /zh/getting-started/
+      - title: "开发与预览"
+        description: "适合日常内容与模板开发。"
+        url: /zh/blog/cli-workflow/
+      - title: "部署与发布"
+        description: "适合 CI、Pages 与发布流程负责人。"
+        url: /zh/github-pages/
+      - title: "版本与动态"
+        description: "适合跟踪版本迭代与对外信息。"
+        url: /zh/news/
   - title: "按意而择"
     description: "来者所怀，各有不同。"
     variant: "cards"
@@ -64,6 +85,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "v0.2.0 发布"
+        description: "本轮文档体系升级与宣传稿。"
+        url: /zh/news/v0-2-0/
       - label: "首发新闻"
         description: "总览 2026 年 3 月 25 日此轮所成。"
         url: /zh/news/project-status/

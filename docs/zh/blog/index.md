@@ -16,6 +16,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "完整使用说明"
+        description: "从安装、构建、预览、翻译、发布到排错的一站式实战手册。"
+        url: /zh/blog/complete-usage-guide/
       - title: "特性总览"
         description: "综观渲染、发布语义、Filters、分页与站点构建能力。"
         url: /zh/blog/feature-overview/
@@ -46,6 +49,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "先观完整使用说明"
+        description: "若欲速成，先取一篇总册以立全局。"
+        url: /zh/blog/complete-usage-guide/
       - label: "先观特性总览"
         description: "先立全局之识。"
         url: /zh/blog/feature-overview/

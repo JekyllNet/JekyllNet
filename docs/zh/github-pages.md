@@ -5,8 +5,6 @@ permalink: /zh/github-pages/
 lang: "zh-CN"
 nav_key: "docs"
 ---
-# 站点部署
-
 今仓库之 `docs`，已成一套可用于 GitHub Pages 之源站结构。其既为对外文档，亦为吾之真实构建 fixture 之一。
 
 ## docs 之分工
@@ -54,7 +52,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: JekyllNet/action@main
+      - uses: JekyllNet/action@v2
         with:
           source: ./docs
           destination: ./artifacts/docs-site
@@ -62,7 +60,7 @@ jobs:
           artifact-name: docs-site
 ```
 
-今仓库尚未另发 action 版本 tag，故示例暂用 `@main`；待 release tag 可用时，再改钉其定版。
+  今 action 已发布 `v2` 标签，默认安装之 JekyllNet CLI 版本为 `0.2.0`。
 
 ## 仓库内置之 Pages workflow
 
@@ -78,4 +76,3 @@ jobs:
 其触发范围含 `docs/**`、`JekyllNet.Cli/**`、`JekyllNet.Core/**`、`JekyllNet.slnx` 与工作流自身；故文档之改，或生成器之改，皆可使 Pages 站点随之更新。
 
 更详之命令行与自动化说明，可参 [CLI 与开发工作流](/zh/blog/cli-workflow/)。
----

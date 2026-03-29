@@ -34,6 +34,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "Complete usage"
+        description: "The end-to-end handbook from setup and preview to release and troubleshooting."
+        url: /en/blog/complete-usage-guide/
       - title: "Features"
         description: "Rendering, publishing semantics, filters, pagination, and site-building behavior."
         url: /en/blog/feature-overview/
@@ -46,6 +49,24 @@ sections:
       - title: "AI translation"
         description: "Locales, translation links, provider selection, cache, incremental translation, and glossary."
         url: /en/blog/ai-translation/
+  - title: "Choose by function"
+    description: "A fast route based on team role or delivery phase."
+    variant: "quick-links"
+    columns: 4
+    section_class: ""
+    items:
+      - title: "Setup and onboarding"
+        description: "For first-time contributors and quick local validation."
+        url: /en/getting-started/
+      - title: "Authoring and preview"
+        description: "For daily content and template development loops."
+        url: /en/blog/cli-workflow/
+      - title: "Deployment and CI"
+        description: "For GitHub Pages and automation owners."
+        url: /en/github-pages/
+      - title: "Release updates"
+        description: "For version tracking and external communication."
+        url: /en/news/
   - title: "Choose by intent"
     description: "Different contributors usually start with different questions."
     variant: "cards"
@@ -64,6 +85,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "v0.2.0 release"
+        description: "The latest release announcement with links to official project entry points."
+        url: /en/news/v0-2-0/
       - label: "Launch announcement"
         description: "The first-release news post summarizes what shipped on March 25, 2026."
         url: /en/news/project-status/

@@ -16,6 +16,9 @@ sections:
     columns: 4
     section_class: ""
     items:
+      - title: "Complete usage guide"
+        description: "An end-to-end practical handbook from setup to publishing and troubleshooting."
+        url: /en/blog/complete-usage-guide/
       - title: "Feature overview"
         description: "A practical tour of rendering, publishing semantics, filters, and site-building capabilities."
         url: /en/blog/feature-overview/
@@ -46,6 +49,9 @@ sections:
     columns: 1
     section_class: "panel panel-section"
     items:
+      - label: "Read complete usage guide first"
+        description: "This gives you the fastest practical path from zero to stable daily workflow."
+        url: /en/blog/complete-usage-guide/
       - label: "Read feature overview first"
         description: "This gives you the broadest picture of what JekyllNet can already do."
         url: /en/blog/feature-overview/

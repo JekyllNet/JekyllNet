@@ -8,20 +8,32 @@ nav_key: "news"
 intro:
   eyebrow: "项目纪事"
   title: "项目新闻"
-  description: "新闻页所以记其里程碑。今第一篇，即此轮 docs、工作流与兼容基线之首发公告。"
+  description: "新闻页所以记其里程碑。今以 v0.2.0 发布为最新篇，首发公告仍可追溯。"
 sections:
   - title: "最新一篇"
-    description: "宜先读其首发文。"
+    description: "宜先读 v0.2.0 发布稿。"
+    variant: "quick-links"
+    columns: 2
+    section_class: ""
+    items:
+      - title: "JekyllNet v0.2.0 发布：文档体系升级与工具使用全指南"
+        description: "本轮发布重点在完整使用说明与分类化文档补齐。"
+        url: /zh/news/v0-2-0/
+      - title: "返回文档首页"
+        description: "既读新闻，可复返首页，续观快速开始与专题博客。"
+        url: /zh/
+  - title: "历史发布"
+    description: "往期版本与里程碑记录。"
     variant: "quick-links"
     columns: 2
     section_class: ""
     items:
       - title: "JekyllNet 首发：文档站、工作流与兼容性基线"
-        description: "2026 年 3 月 25 日此轮对外交付之正式说明。"
+        description: "2026 年 3 月 25 日首轮对外交付之正式说明。"
         url: /zh/news/project-status/
-      - title: "返回文档首页"
-        description: "既读新闻，可复返首页，续观快速开始与专题博客。"
-        url: /zh/
+      - title: "v0.2.0 发布稿"
+        description: "本轮文档体系升级与对外传播稿。"
+        url: /zh/news/v0-2-0/
   - title: "可续观者"
     description: "观其新闻之后，宜再读此数篇。"
     variant: "list"
