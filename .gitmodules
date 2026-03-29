@@ -19,3 +19,6 @@
 [submodule "themes/just-the-docs"]
 	path = themes/just-the-docs
 	url = https://github.com/JekyllNet/just-the-docs.git
+[submodule "themes/jekyll-theme-lumen"]
+	path = themes/jekyll-theme-lumen
+	url = https://github.com/JekyllNet/jekyll-theme-lumen.git
