@@ -16,6 +16,16 @@
 - 📚 Collections: https://jekyllrb.com/docs/collections/
 - 📚 Rendering Process: https://jekyllrb.com/docs/rendering-process/
 
+## 智能体与工具执行约束
+
+为保证仓库内工程实践一致性，自本路线图版本起，所有智能体/自动化实现遵循以下硬约束：
+
+- 仅使用 `C#` 与 `.NET 10` 开发工具能力。
+- 不使用 `PowerShell`（含 `ps` / `pwsh`）作为工具实现方式。
+- 不使用其他脚本或运行时（如 Python、Node.js、Shell）替代工具实现。
+
+这组约束是执行层面的工程规范，适用于后续路线图中的所有实现项。
+
 ## 🚀 当前基线
 
 截至 2026-03-25，当前仓库已经稳定具备：
