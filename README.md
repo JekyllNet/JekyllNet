@@ -1,7 +1,5 @@
 # JekyllNet
 
-![JekyllNet social preview](docs/assets/brand/social-preview.png)
-
 ![JekyllNet lockup](docs/assets/brand/jekyll-net-lockup.svg)
 
 **Jekyll-style Static Site Generator for .NET**  
