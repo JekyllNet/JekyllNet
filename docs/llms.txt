@@ -1,0 +1,32 @@
+# JekyllNet
+
+> Jekyll-style static site generator for .NET 10 — brings Jekyll/GitHub Pages workflows into the C# ecosystem.
+
+JekyllNet is a .NET 10 static site generator that rebuilds Jekyll and GitHub Pages behaviours in C#. It supports front matter, layouts, includes, collections, posts, pagination, Sass/SCSS, multilingual AI translation, local preview, dotnet tool distribution, and reusable GitHub Actions.
+
+## Project Links
+
+- [GitHub Repository](https://github.com/JekyllNet/JekyllNet): Source code, issues, and pull requests
+- [NuGet Package](https://www.nuget.org/packages/JekyllNet): Install via `dotnet tool install --global JekyllNet`
+- [GitHub Action](https://github.com/JekyllNet/action): Reusable `JekyllNet/action@v2.5` for CI/CD
+
+## Documentation
+
+- [English Docs Home](https://jekyllnet.help/en/): Full English documentation
+- [Chinese Docs Home](https://jekyllnet.help/zh/): 中文完整文档
+- [Getting Started (EN)](https://jekyllnet.help/en/getting-started/): Installation, first build, CLI reference
+- [Getting Started (ZH)](https://jekyllnet.help/zh/getting-started/): 安装与快速开始
+- [Complete Usage Guide (EN)](https://jekyllnet.help/en/blog/complete-usage-guide/): End-to-end usage walkthrough
+- [Compatibility (EN)](https://jekyllnet.help/en/compatibility/): Jekyll/GitHub Pages feature compatibility matrix
+- [Deployment / GitHub Pages (EN)](https://jekyllnet.help/en/github-pages/): Deploy to GitHub Pages with JekyllNet
+- [Latest Release — v0.2.5 (EN)](https://jekyllnet.help/en/news/v0-2-5/): What is new in v0.2.5
+
+## Optional
+
+- [CLI Workflow Guide](https://jekyllnet.help/en/blog/cli-workflow/): `build`, `watch`, `serve` commands in depth
+- [AI Translation Guide](https://jekyllnet.help/en/blog/ai-translation/): Multilingual pipeline with OpenAI, DeepSeek, Ollama
+- [Configuration Guide](https://jekyllnet.help/en/blog/configuration-guide/): `_config.yml` options reference
+- [Feature Overview](https://jekyllnet.help/en/blog/feature-overview/): All supported Jekyll features
+- [README on GitHub](https://github.com/JekyllNet/JekyllNet/blob/main/README.md): Quick start and development commands
+- [CHANGELOG on GitHub](https://github.com/JekyllNet/JekyllNet/blob/main/CHANGELOG.md): Version history
+- [Full AI context (llms-full.txt)](https://jekyllnet.help/llms-full.txt): Extended content for deep AI queries
