@@ -1,0 +1,159 @@
+# JekyllNet
+
+> Jekyll-style static site generator for .NET 10 — brings Jekyll/GitHub Pages workflows into the C# ecosystem.
+
+JekyllNet is a .NET 10 static site generator that rebuilds Jekyll and GitHub Pages behaviours in C#. It supports front matter, layouts, includes, collections, posts, pagination, Sass/SCSS, multilingual AI translation, local preview, dotnet tool distribution, and reusable GitHub Actions. Current version: **0.2.5**. Runtime: **.NET 10**. License: **MIT**.
+
+## Project Links
+
+- [GitHub Repository](https://github.com/JekyllNet/JekyllNet): Source code, issues, and pull requests
+- [Website & Docs](https://jekyllnet.help): Full documentation site (English and Chinese)
+- [NuGet Package](https://www.nuget.org/packages/JekyllNet): `dotnet tool install --global JekyllNet --version 0.2.5`
+- [GitHub Action](https://github.com/JekyllNet/action): `JekyllNet/action@v2.5`
+
+## Documentation
+
+- [README](https://github.com/JekyllNet/JekyllNet/blob/main/README.md): Quick start, CLI usage, AI translation, development commands
+- [CHANGELOG](https://github.com/JekyllNet/JekyllNet/blob/main/CHANGELOG.md): Version history and release notes
+- [ROADMAP](https://github.com/JekyllNet/JekyllNet/blob/main/ROADMAP.md): Completed phases and upcoming work
+- [English Docs Home](https://jekyllnet.help/en/): Full English documentation
+- [Chinese Docs Home](https://jekyllnet.help/zh/): 中文完整文档
+- [Getting Started (EN)](https://jekyllnet.help/en/getting-started/): Installation, first build, CLI reference
+- [Getting Started (ZH)](https://jekyllnet.help/zh/getting-started/): 安装与快速开始
+- [Complete Usage Guide (EN)](https://jekyllnet.help/en/blog/complete-usage-guide/): End-to-end usage walkthrough
+- [Compatibility (EN)](https://jekyllnet.help/en/compatibility/): Jekyll/GitHub Pages feature compatibility matrix
+- [Deployment / GitHub Pages (EN)](https://jekyllnet.help/en/github-pages/): Deploy to GitHub Pages with JekyllNet
+- [Latest Release — v0.2.5 (EN)](https://jekyllnet.help/en/news/v0-2-5/): What is new in v0.2.5
+- [CLI Workflow Guide](https://jekyllnet.help/en/blog/cli-workflow/): `build`, `watch`, `serve` commands in depth
+- [AI Translation Guide](https://jekyllnet.help/en/blog/ai-translation/): Multilingual pipeline with OpenAI, DeepSeek, Ollama
+- [Configuration Guide](https://jekyllnet.help/en/blog/configuration-guide/): `_config.yml` options reference
+- [Feature Overview](https://jekyllnet.help/en/blog/feature-overview/): All supported Jekyll features
+
+## Installation
+
+```bash
+# Install as a global dotnet tool
+dotnet tool install --global JekyllNet --version 0.2.5
+
+# Build a site
+jekyllnet build --source ./my-site
+
+# Local preview with live reload
+jekyllnet serve --source ./my-site --port 5055
+
+# Watch for changes
+jekyllnet watch --source ./my-site
+```
+
+## GitHub Action
+
+Minimal workflow using `JekyllNet/action@v2.5`:
+
+```yaml
+- uses: JekyllNet/action@v2.5
+  with:
+    source: ./docs
+    destination: ./artifacts/docs-site
+    upload-artifact: "true"
+    artifact-name: docs-site
+```
+
+## Core Features
+
+### Jekyll-compatible features (all implemented)
+- `_config.yml` site configuration with defaults and `{{version}}` placeholder
+- YAML Front Matter on pages, posts, and static files
+- Layouts (`_layouts/`) with nested layout inheritance
+- Includes (`_includes/`) with parameter passing
+- Data files (`_data/`)
+- Posts (`_posts/`) with date-based permalinks, tags, categories
+- Collections with custom permalinks
+- Drafts, future posts, unpublished pages
+- Pagination with `per_page`, `path`, per-page disable
+- Excerpts with configurable `excerpt_separator`
+- Sass/SCSS compilation (entry file requires YAML Front Matter)
+- Static file copying and front matter defaults
+- `include`/`exclude` lists in config
+- Site-level `permalink` fallback patterns
+
+### Liquid template engine
+- Tags: `if/elsif/else/endif`, `unless`, `for/endfor` (with `limit`, `offset`, `reversed`, `forloop` metadata), `assign`, `capture`, `case/when`, `include`, `comment`, `raw`
+- Filters: `relative_url`, `absolute_url`, `markdownify`, `where`, `sort`, `map`, `compact`, `jsonify`, `slugify`, `replace_first`, `date`, `append`, `prepend`, `downcase`, `upcase`, `strip_html`, and more
+
+### AI Translation Pipeline
+Configure in `_config.yml` to auto-generate multilingual pages at build time:
+
+```yaml
+lang: zh-CN
+ai:
+  provider: openai          # openai | deepseek | ollama | any OpenAI-compatible
+  model: gpt-5-mini
+  api_key_env: OPENAI_API_KEY
+  translate:
+    targets: [en, fr]
+    front_matter_keys: [title, description]
+    glossary: _i18n/glossary.yml
+    cache_path: .jekyllnet/translation-cache.json
+```
+
+Supports: OpenAI, DeepSeek, Ollama, and any OpenAI-compatible API. Features incremental translation, translation cache, and glossary/terminology control.
+
+### Plugin System (Phase 5 — in progress)
+- Plugin interfaces: `ILiquidTag`, `ILiquidBlock`, `ILiquidFilter`, `IJekyllGenerator`
+- `_plugins/` directory auto-loaded at build time
+- Roslyn-based dynamic C# compilation for plugins (`.cs` files compiled at runtime)
+- Ruby-to-C# plugin transpiler (best-effort, for `.rb` plugins)
+- BibTeX bibliography support: `{% bibliography %}`, `{% cite key %}`, `{% reference key %}`
+- Parses `_bibliography/papers.bib`, injects `site.bibliography_entries` and `site.bibliography_by_key`
+
+## Tested Themes
+
+All six themes pass the full build matrix (`dotnet run --project scripts/JekyllNet.ReleaseTool -- test-theme-matrix`):
+
+- [just-the-docs](https://github.com/JekyllNet/just-the-docs)
+- [minimal-mistakes](https://github.com/JekyllNet/minimal-mistakes)
+- [al-folio](https://github.com/JekyllNet/al-folio)
+- [jekyll-theme-chirpy](https://github.com/JekyllNet/jekyll-theme-chirpy)
+- [jekyll-TeXt-theme](https://github.com/kitian616/jekyll-TeXt-theme)
+- [jekyll-theme-lumen](https://github.com/JekyllNet/jekyll-theme-lumen)
+
+## Development Commands
+
+```bash
+# Run all tests
+dotnet test ./JekyllNet.slnx
+
+# Build the NuGet package
+dotnet pack ./JekyllNet.Cli/JekyllNet.Cli.csproj -c Release
+
+# Run the full theme compatibility matrix
+dotnet run --project ./scripts/JekyllNet.ReleaseTool -- test-theme-matrix --max-parallelism 5
+```
+
+## Distribution
+
+- NuGet `JekyllNet` dotnet tool
+- `JekyllNet/action@v2.5` reusable GitHub Action
+- winget manifest (see `packaging/winget/`)
+- GitHub workflows: `ci.yml`, `github-pages.yml`, `publish-dotnet-tool.yml`, `release-artifacts.yml`
+
+## Known Limitations
+
+- Liquid edge-case semantics not fully aligned with Ruby Jekyll in all cases
+- Pagination has some compatibility gaps vs. `jekyll-paginate`
+- GitHub Pages plugin ecosystem not fully covered
+- BibTeX/Scholar high-level features (grouping, full `@string` macro expansion) still in progress
+
+## Repository Structure
+
+```
+JekyllNet.Core/       # Core build engine (C# library)
+JekyllNet.Cli/        # CLI tool entry point
+JekyllNet.Tests/      # Unit and integration tests
+docs/                 # Documentation site source (built by JekyllNet itself)
+sample-site/          # Sample site used as build regression fixture
+themes/               # Git submodules for tested themes
+scripts/              # Release and tooling scripts (C# / .NET)
+action/               # GitHub Action definition
+packaging/            # winget manifest and packaging helpers
+```
